@@ -1,0 +1,35 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme -->
+    <style name="Theme.SoSoMoneNote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand colors -->
+        <item name="colorPrimary">#D7BFA8</item>
+        <item name="colorPrimaryVariant">#C0A68C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <!-- Secondary brand colors -->
+        <item name="colorSecondary">#E4C9AA</item>
+        <item name="colorSecondaryVariant">#C0A68C</item>
+        <item name="colorOnSecondary">#000000</item>
+
+        <!-- Background color -->
+        <item name="android:colorBackground">#F2E4CF</item> <!-- ✅ 修正這行 -->
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Other UI settings -->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- NoActionBar variant -->
+    <style name="Theme.SoSoMoneNote.NoActionBar" parent="Theme.SoSoMoneNote">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Toolbar overlay -->
+    <style name="Theme.SoSoMoneNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- Popup overlay -->
+    <style name="Theme.SoSoMoneNote.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

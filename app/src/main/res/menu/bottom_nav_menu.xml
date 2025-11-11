@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_overview"
+        android:tint="@color/cute_primary"
+        android:icon="@drawable/ic_overview"
+        android:title="總覽" />
+    <item
+        android:id="@+id/nav_account"
+        android:tint="@color/cute_primary"
+        android:icon="@drawable/ic_account"
+        android:title="帳戶" />
+    <item
+        android:id="@+id/nav_analysis"
+        android:tint="@color/cute_primary"
+        android:icon="@drawable/ic_report"
+        android:title="分析" />
+    <item
+        android:id="@+id/nav_report"
+        android:tint="@color/cute_primary"
+        android:icon="@drawable/ic_account"
+        android:title="明細" />
+
+</menu>

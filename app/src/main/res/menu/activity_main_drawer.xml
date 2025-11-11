@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_budge"
+            android:icon="@drawable/ic_budge"
+            android:title="@string/menu_budge" />
+        <item
+            android:id="@+id/nav_import"
+            android:icon="@drawable/ic_import"
+            android:title="@string/menu_import" />
+        <item
+            android:id="@+id/nav_cata_setting"
+            android:icon="@drawable/ic_cata_setting"
+            android:title="@string/menu_cata_setting" />
+
+        <item
+            android:id="@+id/nav_delete_all"
+            android:icon="@drawable/ic_delete"
+            android:title="@string/menu_delete" />
+    </group>
+</menu>

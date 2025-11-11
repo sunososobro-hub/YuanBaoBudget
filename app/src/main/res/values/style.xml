@@ -1,0 +1,53 @@
+<resources>
+
+    <!-- 🌷 主題：SoSoMoneNote 可愛風 -->
+    <style name="Theme.SoSoMoneNote.Cute" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 主色系 -->
+        <item name="colorPrimary">@color/cute_primary</item>
+        <item name="colorPrimaryVariant">@color/cute_secondary</item>
+        <item name="colorSecondary">@color/cute_pink</item>
+
+        <!-- 背景與文字 -->
+        <item name="android:colorBackground">@color/cute_bg</item>
+        <item name="android:textColorPrimary">@color/cute_text_dark</item>
+
+        <!-- AppBar 顏色 -->
+        <item name="actionBarTheme">@style/CuteActionBar</item>
+        <item name="android:statusBarColor">@color/cute_primary</item>
+    </style>
+
+    <!-- 🍯 AppBar 樣式 -->
+    <style name="CuteActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="colorPrimary">@color/cute_primary</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!-- 🧁 卡片樣式 -->
+    <style name="CuteCardView">
+        <item name="android:background">@color/cute_bg</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <!-- 🍓 icon 樣式 -->
+    <style name="CuteIcon">
+        <item name="android:tint">@color/cute_accent_blue</item>
+    </style>
+
+    <!-- 🩵 可愛按鈕樣式（MaterialButton 推薦版） -->
+    <style name="CuteButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/cute_secondary</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedButtonShape</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <!-- 定義圓角按鈕外觀 -->
+    <style name="RoundedButtonShape" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+</resources>

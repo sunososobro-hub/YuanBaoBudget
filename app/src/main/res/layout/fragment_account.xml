@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5E7D2"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- 🔹 總覽區 (使用 CardView 包裝) -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#FFF9F0">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- 🔹 淨資產 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvNetAssetsTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="淨資產"
+                            android:textColor="#4A3B2A"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvNetAssets"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NT$502,665"
+                            android:textColor="#000000"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_drop_down"
+                        android:contentDescription="可愛小熊"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="#D8C7A8" />
+
+                <!-- 🔸 資產與負債 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvAssetsTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="資產"
+                            android:textColor="#4A3B2A"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvAssets"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NT$6,844,330"
+                            android:textColor="#000000"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="end">
+
+                        <TextView
+                            android:id="@+id/tvDebtTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="負債"
+                            android:textColor="#4A3B2A"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvDebt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-NT$6,341,665"
+                            android:textColor="#000000"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- 🔸 現金帳戶 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionCash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="現金帳戶" />
+
+        <!-- 🔸 銀行帳戶 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionBank"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="銀行帳戶" />
+
+        <!-- 🔸 電子錢包 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionEwallet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="電子錢包" />
+
+        <!-- 🔸 信用卡 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionCredit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="信用卡帳戶" />
+
+        <!-- 🔸 投資帳戶 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionInvest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="投資帳戶" />
+
+        <!-- 🔸 虛擬帳戶 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionVirtual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="虛擬帳戶" />
+
+        <!-- 🔸 其他帳戶 -->
+        <include
+            layout="@layout/item_account_section"
+            android:id="@+id/sectionOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="其他帳戶" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="80dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

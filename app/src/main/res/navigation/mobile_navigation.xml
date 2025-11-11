@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_overview">
+<!--
+    <fragment
+        android:id="@+id/nav_budge"
+        android:name="com.sosobro.sosomonenote.ui.budge.BudgeFragment"
+        android:label="預算"
+        tools:layout="@layout/fragment_budge" />
+-->
+    <activity
+        android:id="@+id/nav_import"
+        android:name="com.sosobro.sosomonenote.ui.importdata.ImportDataActivity"
+        android:label="匯入"
+        tools:layout="@layout/activity_import_data" />
+
+    <activity
+        android:id="@+id/nav_cata_setting"
+        android:name="com.sosobro.sosomonenote.ui.category.CategorySettingActivity"
+        android:label="分類"
+        tools:layout="@layout/activity_cata_setting" />
+
+    <fragment
+        android:id="@+id/nav_overview"
+        android:name="com.sosobro.sosomonenote.ui.overview.OverviewFragment"
+        android:label="總覽"
+        tools:layout="@layout/fragment_overview" />
+
+    <!-- 帳戶 -->
+    <fragment
+        android:id="@+id/nav_account"
+        android:name="com.sosobro.sosomonenote.ui.account.AccountFragment"
+        android:label="帳戶"
+        tools:layout="@layout/fragment_account" />
+
+    <fragment
+        android:id="@+id/nav_analysis"
+        android:name="com.sosobro.sosomonenote.ui.analysis.AnalysisFragment"
+        android:label="報表"
+        tools:layout="@layout/fragment_analysis" />
+
+    <!-- 報表 -->
+    <fragment
+        android:id="@+id/nav_report"
+        android:name="com.sosobro.sosomonenote.ui.report.ReportFragment"
+        android:label="報表"
+        tools:layout="@layout/fragment_report" />
+
+    <activity
+        android:id="@+id/nav_record_activity"
+        android:name="com.sosobro.sosomonenote.ui.record.RecordActivity"
+        android:label="新增記帳"
+        tools:layout="@layout/activity_record" />
+
+</navigation>

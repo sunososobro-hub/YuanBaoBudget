@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SoSoMoneNote"
+        tools:targetApi="31">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SoSoMoneNote.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.record.RecordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+        <activity
+            android:name=".ui.addaccount.AddAccountActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+        <activity
+            android:name=".ui.accounttype.AccountTypeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+        <activity
+            android:name=".ui.account.AccountDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
+        <activity android:name=".ui.importdata.ImportDataActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.category.CategorySettingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoSoMoneNote" />
+        <activity
+            android:name=".ui.transaction.TransactionDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoSoMoneNote" />
+
+    </application>
+
+</manifest>
