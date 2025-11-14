@@ -14,11 +14,24 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY date DESC")
     suspend fun getAllTransactions(): List<TransactionEntity>
 
+    @Query("SELECT * FROM transactions WHERE date >= :date ORDER BY date ASC")
+    suspend fun getTransactionsAfterDate(date: String): List<TransactionEntity>
+
     @Query("SELECT * FROM transactions WHERE accountId = :accountId ORDER BY date DESC")
     suspend fun getTransactionsByAccount(accountId: Int): List<TransactionEntity>
 
     @Query("SELECT * FROM transactions WHERE type = :type ORDER BY date DESC")
     suspend fun getTransactionsByType(type: String): List<TransactionEntity>
+
+    @Query("SELECT t.date FROM transactions AS t ORDER BY t.date DESC LIMIT 1")
+    suspend fun getLatestDate(): String?
+
+    @Query("""
+    SELECT * FROM transactions
+    WHERE strftime('%Y', date) = :yearStr
+      AND strftime('%m', date) = :monthStr
+""")
+    suspend fun getValidTransactionsForMonth(yearStr: String, monthStr: String): List<TransactionEntity>
 
     @Query("DELETE FROM transactions")
     suspend fun clearAll()
@@ -32,9 +45,6 @@ interface TransactionDao {
     @Query("DELETE FROM transactions WHERE accountId = :accountId")
     suspend fun deleteByAccountId(accountId: Int)
 
-    @Query("DELETE FROM categories")
-    suspend fun deleteAll()
-
     @Query("SELECT * FROM transactions WHERE id = :id LIMIT 1")
     suspend fun getTransactionById(id: Int): TransactionEntity?
 
@@ -44,6 +54,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE strftime('%Y', date) = :year AND strftime('%m', date) = printf('%02d', :month)")
     suspend fun getTransactionsForMonth(year: Int, month: Int): List<TransactionEntity>
 
-    @Query("SELECT * FROM transactions WHERE date < :date")
+
+    // ⭐⭐⭐ 你缺少的 → 我幫你補上
+    @Query("SELECT * FROM transactions WHERE date < :date ORDER BY date DESC")
     suspend fun getTransactionsBeforeDate(date: String): List<TransactionEntity>
 }
+

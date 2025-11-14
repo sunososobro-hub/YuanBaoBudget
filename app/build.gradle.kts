@@ -53,6 +53,10 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    // --- Glide (用於載入 Google 大頭貼) ---
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // ✅ Room 資料庫
     implementation("androidx.room:room-runtime:2.6.1")

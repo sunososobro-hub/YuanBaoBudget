@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "355054336807",
+    "project_id": "monenote-1f112",
+    "storage_bucket": "monenote-1f112.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355054336807:android:c2e890ff008a2758b50702",
+        "android_client_info": {
+          "package_name": "com.sosobro.sosomonenote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "355054336807-hter4si8o80v3fioet5lqjob87h2ii56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe2OTbrcTW9CAjSeOLyogYX7hjwwXXFlQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355054336807-hter4si8o80v3fioet5lqjob87h2ii56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

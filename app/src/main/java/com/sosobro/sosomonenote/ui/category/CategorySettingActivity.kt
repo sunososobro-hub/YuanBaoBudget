@@ -1,25 +1,22 @@
 package com.sosobro.sosomonenote.ui.category
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
-import com.sosobro.sosomonenote.R
-import com.sosobro.sosomonenote.database.CategoryEntity
 import com.sosobro.sosomonenote.database.DatabaseInstance
 import com.sosobro.sosomonenote.databinding.ActivityCataSettingBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.lifecycle.lifecycleScope
 
 class CategorySettingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCataSettingBinding
-    private lateinit var adapter: CategoryAdapter
+    private lateinit var adapterExpense: CategoryAdapter
+    private lateinit var adapterIncome: CategoryAdapter
     private var currentType = "支出"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,44 +24,62 @@ class CategorySettingActivity : AppCompatActivity() {
         binding = ActivityCataSettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 🔙 返回
         binding.btnBack.setOnClickListener { finish() }
 
-        // ➕ 新增分類（未實作功能時先 Toast）
+        // 點 ➕ 會依據目前類型跳轉
         binding.btnAddCategory.setOnClickListener {
-            Toast.makeText(this, "新增分類功能開發中", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddCategoryActivity::class.java)
+            intent.putExtra("type", currentType)
+            startActivityForResult(intent, 1001)
         }
 
-        // 🔹 Tab 切換（支出 / 收入）
+        // 設定 TabLayout（支出 / 收入）
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("支出"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("收入"))
+
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 currentType = tab.text.toString()
-                loadCategories()
+                switchAdapter(currentType)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        // 🔹 RecyclerView
-        adapter = CategoryAdapter()
-        binding.recyclerView.layoutManager = GridLayoutManager(this, 4)
-        binding.recyclerView.adapter = adapter
+        // 初始化兩個 Adapter（支出、收入各自一份）
+        adapterExpense = CategoryAdapter()
+        adapterIncome = CategoryAdapter()
 
-        // 初始載入支出類別
-        loadCategories()
+        binding.recyclerView.layoutManager = GridLayoutManager(this, 4)
+        binding.recyclerView.adapter = adapterExpense // 預設支出
+
+        // 載入兩邊的資料
+        loadCategories("支出")
+        loadCategories("收入")
     }
 
-    private fun loadCategories() {
+    private fun switchAdapter(type: String) {
+        binding.recyclerView.adapter =
+            if (type == "支出") adapterExpense else adapterIncome
+    }
+
+    private fun loadCategories(type: String) {
         lifecycleScope.launch {
             val db = DatabaseInstance.getDatabase(this@CategorySettingActivity)
             val categories = withContext(Dispatchers.IO) {
-                db.categoryDao().getCategoriesByType(currentType)
+                db.categoryDao().getCategoriesByType(type)
             }
+            if (type == "支出") adapterExpense.submitList(categories)
+            else adapterIncome.submitList(categories)
+        }
+    }
 
-            adapter.submitList(categories)
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            loadCategories(currentType)
         }
     }
 }

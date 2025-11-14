@@ -2,27 +2,28 @@ package com.sosobro.sosomonenote.ui.analysis
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.github.mikephil.charting.charts.LineChart
+import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.sosobro.sosomonenote.R
+import com.sosobro.sosomonenote.database.DatabaseInstance
 import com.sosobro.sosomonenote.databinding.FragmentAnalysisBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
-class AnalysisFragment  : Fragment() {
+class AnalysisFragment : Fragment() {
 
     private var _binding: FragmentAnalysisBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: AnalysisViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,90 +33,191 @@ class AnalysisFragment  : Fragment() {
         return binding.root
     }
 
-    // 🔹 改成這樣
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val calendarInstance = Calendar.getInstance()
-        val yearNow = calendarInstance.get(Calendar.YEAR)
-        val monthNow = calendarInstance.get(Calendar.MONTH) + 1
+    override fun onResume() {
+        super.onResume()
+        loadAnalysis()
+    }
 
-        viewModel.loadMonthlyAssets(requireContext(), yearNow, monthNow)
+    private fun loadAnalysis() {
+        lifecycleScope.launch {
 
-        viewModel.dailyAssets.observe(viewLifecycleOwner) { data ->
-            setupLineChart(binding.lineChart, data)
+            val context = requireContext()
+            val db = DatabaseInstance.getDatabase(context)
+            val transactionDao = db.transactionDao()
+            val categoryDao = db.categoryDao()
+
+            val allCategories = withContext(Dispatchers.IO) {
+                categoryDao.getAll()
+            }
+
+            // ---- 本月年月字串 ----
+            val calendar = Calendar.getInstance()
+            val yearStr = calendar.get(Calendar.YEAR).toString()
+            val monthStr = String.format("%02d", calendar.get(Calendar.MONTH) + 1)
+
+            // ---- 查詢本月資料 ----
+            val monthTransactions = withContext(Dispatchers.IO) {
+                transactionDao.getValidTransactionsForMonth(yearStr, monthStr)
+            }
+
+            Log.d("SSS", "查詢 year=$yearStr, month=$monthStr, 共=${monthTransactions.size} 筆")
+
+            val expenses = monthTransactions.filter { it.type == "支出" }
+            val incomes = monthTransactions.filter { it.type == "收入" }
+
+            setupPieChartExpenses(expenses, allCategories)
+            setupPieChartIncome(incomes, allCategories)
+            setupLineChart(monthTransactions)
         }
     }
 
-
-    private fun setupLineChart(chart: LineChart, data: List<Pair<String, Double>>) {
-        val entries = data.mapIndexed { index, (date, value) ->
-            Entry(index.toFloat(), value.toFloat())
+    // --------------------------- Pie Chart: 支出 ----------------------------
+    private fun setupPieChartExpenses(
+        expenses: List<com.sosobro.sosomonenote.database.TransactionEntity>,
+        categories: List<com.sosobro.sosomonenote.database.CategoryEntity>
+    ) {
+        val total = expenses.sumOf { kotlin.math.abs(it.amount) }
+        if (total == 0.0) {
+            binding.pieExpense.data = null
+            binding.pieExpense.invalidate()
+            return
         }
 
-        val dataSet = LineDataSet(entries, "每日總資產").apply {
-            color = Color.parseColor("#5B6FC7")
-            setCircleColor(Color.parseColor("#5B6FC7"))
-            lineWidth = 2f
-            circleRadius = 4f
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-            setDrawFilled(true)
-            fillColor = Color.parseColor("#C5CAE9")
-            setDrawValues(false) // ✅ 不顯示數字
-        }
+        val grouped = expenses.groupBy { it.category }
+            .map { (cat, list) ->
+                val sum = list.sumOf { kotlin.math.abs(it.amount) }
+                PieEntry(sum.toFloat(), cat)
+            }
 
-        chart.apply {
-            this.data = LineData(dataSet)
+        val dataSet = PieDataSet(grouped, "")
+        dataSet.colors = listOf(
+            Color.parseColor("#F94144"), Color.parseColor("#F3722C"), Color.parseColor("#F8961E"),
+            Color.parseColor("#F9C74F"), Color.parseColor("#90BE6D"), Color.parseColor("#43AA8B")
+        )
+        dataSet.sliceSpace = 2f
+
+        // ⭐ 標籤移到外面 + 指示線
+        dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        dataSet.valueLinePart1OffsetPercentage = 80f
+        dataSet.valueLinePart1Length = 0.4f
+        dataSet.valueLinePart2Length = 0.6f
+        dataSet.valueLineColor = Color.GRAY
+
+        val pieData = PieData(dataSet)
+        pieData.setValueTextSize(10f)
+        pieData.setValueTextColor(Color.BLACK)
+        pieData.setValueFormatter(PercentFormatter(binding.pieExpense))
+
+        binding.pieExpense.apply {
+            data = pieData
+            setUsePercentValues(true)
             description.isEnabled = false
-            setTouchEnabled(true)
-            isDragEnabled = true
-            setScaleEnabled(false)
-            setPinchZoom(false)
+            legend.orientation = Legend.LegendOrientation.HORIZONTAL
+            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+            animateY(800)
+            invalidate()
+        }
+    }
+
+    // --------------------------- Pie Chart: 收入 ----------------------------
+    private fun setupPieChartIncome(
+        incomes: List<com.sosobro.sosomonenote.database.TransactionEntity>,
+        categories: List<com.sosobro.sosomonenote.database.CategoryEntity>
+    ) {
+        val total = incomes.sumOf { it.amount }
+        if (total == 0.0) {
+            binding.pieIncome.data = null
+            binding.pieIncome.invalidate()
+            return
+        }
+
+        val grouped = incomes.groupBy { it.category }
+            .map { (cat, list) ->
+                val sum = list.sumOf { it.amount }
+                PieEntry(sum.toFloat(), cat)
+            }
+
+        val dataSet = PieDataSet(grouped, "")
+        dataSet.colors = listOf(
+            Color.parseColor("#4cc9f0"), Color.parseColor("#4895ef"), Color.parseColor("#4361ee"),
+            Color.parseColor("#3a0ca3"), Color.parseColor("#7209b7"), Color.parseColor("#f72585")
+        )
+        dataSet.sliceSpace = 2f
+
+        // ⭐ 標籤移到外面 + 指示線
+        dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        dataSet.valueLinePart1OffsetPercentage = 80f
+        dataSet.valueLinePart1Length = 0.4f
+        dataSet.valueLinePart2Length = 0.6f
+        dataSet.valueLineColor = Color.GRAY
+
+        val pieData = PieData(dataSet)
+        pieData.setValueTextSize(10f)
+        pieData.setValueTextColor(Color.BLACK)
+        pieData.setValueFormatter(PercentFormatter(binding.pieIncome))
+
+        binding.pieIncome.apply {
+            data = pieData
+            setUsePercentValues(true)
+            description.isEnabled = false
+            legend.orientation = Legend.LegendOrientation.HORIZONTAL
+            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+            animateY(800)
+            invalidate()
+        }
+    }
+
+    // --------------------------- Line Chart: 支出 + 收入 ----------------------------
+    private fun setupLineChart(
+        list: List<com.sosobro.sosomonenote.database.TransactionEntity>
+    ) {
+        if (list.isEmpty()) {
+            binding.lineChart.clear()
+            return
+        }
+
+        val df = SimpleDateFormat("dd", Locale.getDefault())
+
+        val expenseEntries = ArrayList<Entry>()
+        val incomeEntries = ArrayList<Entry>()
+
+        list.groupBy { df.format(Date(it.time)).toInt() }.forEach { (day, transactions) ->
+            val dailyExpense = transactions.filter { it.type == "支出" }
+                .sumOf { kotlin.math.abs(it.amount) }.toFloat()
+
+            val dailyIncome = transactions.filter { it.type == "收入" }
+                .sumOf { it.amount }.toFloat()
+
+            expenseEntries.add(Entry(day.toFloat(), dailyExpense))
+            incomeEntries.add(Entry(day.toFloat(), dailyIncome))
+        }
+
+        val expenseSet = LineDataSet(expenseEntries, "支出").apply {
+            color = Color.RED
+            circleRadius = 3f
+            setCircleColor(Color.RED)
+            lineWidth = 2f
+        }
+
+        val incomeSet = LineDataSet(incomeEntries, "收入").apply {
+            color = Color.BLUE
+            circleRadius = 3f
+            setCircleColor(Color.BLUE)
+            lineWidth = 2f
+        }
+
+        val lineData = LineData(expenseSet, incomeSet)
+
+        binding.lineChart.apply {
+            data = lineData
+            description.isEnabled = false
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
             axisRight.isEnabled = false
-
-            // ✅ X軸顯示 yyyy-MM-dd
-            xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
-
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                valueFormatter = com.github.mikephil.charting.formatter.IndexAxisValueFormatter(
-                    data.map {
-                        try {
-                            val parsed = inputFormat.parse(it.first)
-                            outputFormat.format(parsed ?: it.first)
-                        } catch (e: Exception) {
-                            it.first.take(10)
-                        }
-                    }
-                )
-                textColor = Color.DKGRAY
-                labelRotationAngle = -45f
-                granularity = 1f
-            }
-
-            axisLeft.apply {
-                textColor = Color.DKGRAY
-                setDrawGridLines(true)
-            }
-
-            legend.isEnabled = false
-            animateX(700)
-
-            // ✅ 加入 MarkerView 顯示日期與金額
-            val marker = CustomMarkerView(
-                requireContext(),
-                R.layout.marker_view,
-                data.map {
-                    try {
-                        it.first.substring(0, 10)
-                    } catch (e: Exception) {
-                        it.first
-                    }
-                }
-            )
-            marker.chartView = this
-            this.marker = marker
-
+            animateX(800)
             invalidate()
         }
     }

@@ -1,19 +1,15 @@
 package com.sosobro.sosomonenote.ui.account
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.sosobro.sosomonenote.R
 import com.sosobro.sosomonenote.database.AccountEntity
 import com.sosobro.sosomonenote.database.DatabaseInstance
 import com.sosobro.sosomonenote.databinding.FragmentAccountBinding
@@ -27,33 +23,11 @@ class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
 
-    private data class AccountSection(
-        val title: String,
-        val headerLayout: LinearLayout,
-        val recyclerView: RecyclerView,
-        val toggleIcon: ImageView,
-        val adapter: AccountAdapter,
-        var expanded: Boolean = true
-    )
-
-    private lateinit var sections: List<AccountSection>
-
-    // 各分類 Adapter
-    private lateinit var cashAdapter: AccountAdapter
-    private lateinit var bankAdapter: AccountAdapter
-    private lateinit var ewalletAdapter: AccountAdapter
-    private lateinit var creditAdapter: AccountAdapter
-    private lateinit var investAdapter: AccountAdapter
-    private lateinit var virtualAdapter: AccountAdapter
-    private lateinit var otherAdapter: AccountAdapter
+    private lateinit var adapter: AccountAdapter
+    private val prefName = "account_fragment_state"
 
     companion object {
         private const val REQUEST_ADD_ACCOUNT = 1001
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -65,132 +39,51 @@ class AccountFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupAdaptersAndSections()
-        setupToggles()
-        loadAccounts()
-    }
-
-    private fun setupAdaptersAndSections() {
-        // 初始化 Adapter（點擊可進入帳戶詳情）
-        cashAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        bankAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        ewalletAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        creditAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        investAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        virtualAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-        otherAdapter = AccountAdapter(mutableListOf()) { openAccountDetail(it) }
-
-        // 綁定對應的 layout & recycler
-        sections = listOf(
-            AccountSection(
-                "現金帳戶",
-                binding.sectionCash.root.findViewById(R.id.layoutHeader),
-                binding.sectionCash.root.findViewById(R.id.recyclerView),
-                binding.sectionCash.root.findViewById(R.id.ivToggle),
-                cashAdapter
-            ),
-            AccountSection(
-                "銀行帳戶",
-                binding.sectionBank.root.findViewById(R.id.layoutHeader),
-                binding.sectionBank.root.findViewById(R.id.recyclerView),
-                binding.sectionBank.root.findViewById(R.id.ivToggle),
-                bankAdapter
-            ),
-            AccountSection(
-                "電子錢包",
-                binding.sectionEwallet.root.findViewById(R.id.layoutHeader),
-                binding.sectionEwallet.root.findViewById(R.id.recyclerView),
-                binding.sectionEwallet.root.findViewById(R.id.ivToggle),
-                ewalletAdapter
-            ),
-            AccountSection(
-                "信用卡帳戶",
-                binding.sectionCredit.root.findViewById(R.id.layoutHeader),
-                binding.sectionCredit.root.findViewById(R.id.recyclerView),
-                binding.sectionCredit.root.findViewById(R.id.ivToggle),
-                creditAdapter
-            ),
-            AccountSection(
-                "投資帳戶",
-                binding.sectionInvest.root.findViewById(R.id.layoutHeader),
-                binding.sectionInvest.root.findViewById(R.id.recyclerView),
-                binding.sectionInvest.root.findViewById(R.id.ivToggle),
-                investAdapter
-            ),
-            AccountSection(
-                "虛擬帳戶",
-                binding.sectionVirtual.root.findViewById(R.id.layoutHeader),
-                binding.sectionVirtual.root.findViewById(R.id.recyclerView),
-                binding.sectionVirtual.root.findViewById(R.id.ivToggle),
-                virtualAdapter
-            ),
-            AccountSection(
-                "其他帳戶",
-                binding.sectionOther.root.findViewById(R.id.layoutHeader),
-                binding.sectionOther.root.findViewById(R.id.recyclerView),
-                binding.sectionOther.root.findViewById(R.id.ivToggle),
-                otherAdapter
-            )
+        adapter = AccountAdapter(
+            onItemClick = { openAccountDetail(it) },
+            onDataChanged = { list -> saveAccountOrder(list) },
+            onExpandedChanged = { state -> saveExpandedState(state) } // ✅ 折疊狀態即時保存
         )
 
-        // 初始化 RecyclerView
-        sections.forEach { section ->
-            section.recyclerView.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = section.adapter
-            }
-            setupDragAndDrop(section.recyclerView, section.adapter, section.title)
-        }
-    }
+        binding.recyclerViewAccounts.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewAccounts.adapter = adapter
 
-    private fun setupToggles() {
-        sections.forEach { section ->
-            val titleView = section.headerLayout.findViewById<TextView>(R.id.tvTitle)
-            titleView.text = section.title
-
-            section.headerLayout.setOnClickListener {
-                section.expanded = !section.expanded
-                section.recyclerView.visibility = if (section.expanded) View.VISIBLE else View.GONE
-                section.toggleIcon.rotation = if (section.expanded) 0f else -90f
-            }
-        }
+        setupDragAndDrop()
+        loadAccounts(restoreExpanded = true)
     }
 
     private fun openAccountDetail(account: AccountEntity) {
         val intent = Intent(requireContext(), AccountDetailActivity::class.java)
         intent.putExtra("accountId", account.id)
-        intent.putExtra("accountName", account.name)
         startActivity(intent)
     }
 
-    private fun setupDragAndDrop(recyclerView: RecyclerView, adapter: AccountAdapter, type: String) {
-        val callback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-        ) {
-            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                val from = vh.adapterPosition
-                val to = target.adapterPosition
-                adapter.moveItem(from, to)
+    private fun setupDragAndDrop() {
+        val callback = object :
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+            override fun onMove(
+                rv: RecyclerView,
+                vh: RecyclerView.ViewHolder,
+                tgt: RecyclerView.ViewHolder
+            ): Boolean {
+                adapter.moveItem(vh.adapterPosition, tgt.adapterPosition)
                 return true
             }
 
-            override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) {}
-            override fun isLongPressDragEnabled(): Boolean = true
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {}
+            override fun isLongPressDragEnabled() = true
 
             override fun clearView(rv: RecyclerView, vh: RecyclerView.ViewHolder) {
                 super.clearView(rv, vh)
-                saveAccountOrder(adapter.getCurrentList(), type)
+                saveAccountOrder(adapter.getCurrentList())
             }
         }
-        ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
+        ItemTouchHelper(callback).attachToRecyclerView(binding.recyclerViewAccounts)
     }
 
-    private fun saveAccountOrder(list: List<AccountEntity>, type: String) {
+    private fun saveAccountOrder(list: List<AccountEntity>) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val db = DatabaseInstance.getDatabase(requireContext())
-            val dao = db.accountDao()
+            val dao = DatabaseInstance.getDatabase(requireContext()).accountDao()
             list.forEachIndexed { index, acc ->
                 acc.sortOrder = index
                 dao.update(acc)
@@ -200,90 +93,89 @@ class AccountFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadAccounts()
+        updateAccountBalances()
     }
 
-    private fun loadAccounts() {
+    private fun updateAccountBalances() {
+        lifecycleScope.launch {
+            val db = DatabaseInstance.getDatabase(requireContext())
+            val transactionDao = db.transactionDao()
+            val accountDao = db.accountDao()
+            val all = withContext(Dispatchers.IO) { accountDao.getAllAccountsSorted() }
 
+            all.forEach {
+                val total =
+                    withContext(Dispatchers.IO) { transactionDao.getTotalAmountByAccountId(it.id) }
+                it.balance = total ?: 0.0
+                withContext(Dispatchers.IO) { accountDao.update(it) }
+            }
+        }
+    }
+
+    private fun loadAccounts(restoreExpanded: Boolean) {
         lifecycleScope.launch {
             val db = DatabaseInstance.getDatabase(requireContext())
             val accountDao = db.accountDao()
             val transactionDao = db.transactionDao()
+            val all = withContext(Dispatchers.IO) { accountDao.getAllAccountsSorted() }
 
-            val allAccounts = withContext(Dispatchers.IO) { accountDao.getAllAccountsSorted() }
-
-            val cashList = mutableListOf<AccountEntity>()
-            val bankList = mutableListOf<AccountEntity>()
-            val ewalletList = mutableListOf<AccountEntity>()
-            val creditList = mutableListOf<AccountEntity>()
-            val investList = mutableListOf<AccountEntity>()
-            val virtualList = mutableListOf<AccountEntity>()
-            val otherList = mutableListOf<AccountEntity>()
+            val grouped = linkedMapOf(
+                "現金帳戶" to mutableListOf<AccountEntity>(),
+                "銀行帳戶" to mutableListOf(),
+                "電子錢包" to mutableListOf(),
+                "信用卡帳戶" to mutableListOf(),
+                "投資帳戶" to mutableListOf(),
+                "虛擬帳戶" to mutableListOf(),
+                "其他帳戶" to mutableListOf()
+            )
 
             var totalAssets = 0.0
             var totalDebt = 0.0
 
-            for (account in allAccounts) {
-                val totalAmount = withContext(Dispatchers.IO) {
-                    transactionDao.getTotalAmountByAccountId(account.id)
-                }
-                account.balance = totalAmount ?: 0.0
-                withContext(Dispatchers.IO) { accountDao.update(account) }
+            for (acc in all) {
+                val total =
+                    withContext(Dispatchers.IO) { transactionDao.getTotalAmountByAccountId(acc.id) }
+                acc.balance = total ?: 0.0
+                withContext(Dispatchers.IO) { accountDao.update(acc) }
 
-                when {
-                    account.type.contains("現金") -> cashList.add(account)
-                    account.type.contains("銀行") || account.type.contains("儲蓄") -> bankList.add(account)
-                    account.type.contains("電子") || account.type.contains("Pay") -> ewalletList.add(account)
-                    account.type.contains("信用") || account.type.contains("卡") -> creditList.add(account)
-                    account.type.contains("投資") || account.type.contains("股票") -> investList.add(account)
-                    account.type.contains("虛擬") || account.type.contains("加密") -> virtualList.add(account)
-                    else -> otherList.add(account)
-                }
-
-                val allAccounts = withContext(Dispatchers.IO) { accountDao.getAllAccountsSorted() }
-                Log.d("AccountCheck", "總筆數=${allAccounts.size}")
-                allAccounts.forEachIndexed { index, acc ->
-                    Log.d("AccountCheck", "第${index + 1}筆：${acc.id}｜${acc.name}｜${acc.type}")
-                }
-
-
-                if (account.balance >= 0) totalAssets += account.balance else totalDebt += account.balance
+                val key = grouped.keys.firstOrNull { acc.type.contains(it) } ?: "其他帳戶"
+                grouped[key]?.add(acc)
+                if (acc.balance >= 0) totalAssets += acc.balance else totalDebt += acc.balance
             }
 
-            binding.tvAssets.text = "NT$${String.format("%,.0f", totalAssets)}"
-            binding.tvDebt.text = "NT$${String.format("%,.0f", totalDebt)}"
+            binding.layoutSummary.tvAssets.text =
+                "NT$${String.format("%,.0f", totalAssets)}"
+            binding.layoutSummary.tvDebt.text =
+                "NT$${String.format("%,.0f", totalDebt)}"
+            binding.layoutSummary.tvNetAssets.text =
+                "NT$${String.format("%,.0f", totalAssets + totalDebt)}"
 
-            cashAdapter.updateData(cashList)
-            bankAdapter.updateData(bankList)
-            ewalletAdapter.updateData(ewalletList)
-            creditAdapter.updateData(creditList)
-            investAdapter.updateData(investList)
-            virtualAdapter.updateData(virtualList)
-            otherAdapter.updateData(otherList)
-        }
-    }
+            adapter.setData(grouped)
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_account, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_add_account -> {
-                val intent = Intent(requireContext(), AddAccountActivity::class.java)
-                startActivityForResult(intent, REQUEST_ADD_ACCOUNT)
-                true
+            if (restoreExpanded) {
+                val prefs =
+                    requireContext().getSharedPreferences(prefName, Context.MODE_PRIVATE)
+                val stateMap = mutableMapOf<String, Boolean>()
+                grouped.keys.forEach { key ->
+                    stateMap[key] = prefs.getBoolean("expanded_$key", true)
+                }
+                adapter.restoreExpandedState(stateMap)
             }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ADD_ACCOUNT && resultCode == Activity.RESULT_OK) {
-            loadAccounts()
+    private fun saveExpandedState(state: Map<String, Boolean>) {
+        val prefs =
+            requireContext().getSharedPreferences(prefName, Context.MODE_PRIVATE).edit()
+        state.forEach { (key, expanded) ->
+            prefs.putBoolean("expanded_$key", expanded)
         }
+        prefs.apply()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveExpandedState(adapter.getExpandedState())
     }
 
     override fun onDestroyView() {

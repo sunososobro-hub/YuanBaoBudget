@@ -2,7 +2,7 @@
     <string name="app_name">SoSoMoneNote</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_title">點選頭像以登入</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -10,6 +10,7 @@
     <string name="menu_budge">預算設定</string>
     <string name="menu_import">資料導入</string>
     <string name="menu_cata_setting">分類設置</string>
+    <string name="menu_data_sync">雲端同步</string>
     <string name="menu_delete">刪除所有資料</string>
 
 

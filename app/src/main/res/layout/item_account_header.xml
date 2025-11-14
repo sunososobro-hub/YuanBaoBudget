@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="12dp"
+    android:background="#FFF3E0"
+    android:gravity="center_vertical">
+
+    <!-- 分類標題 -->
+    <TextView
+        android:id="@+id/tvHeaderTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="分類名稱"
+        android:textColor="#4A3B2A"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- 折疊箭頭圖示 -->
+    <ImageView
+        android:id="@+id/ivHeaderToggle"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_drop_down"
+    android:tint="#4A3B2A"
+    android:rotation="0" />
+</LinearLayout>

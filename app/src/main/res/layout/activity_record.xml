@@ -1,71 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8EE"
-    android:padding="16dp"
-    tools:context=".ui.record.RecordActivity">
+    android:orientation="vertical"
+    android:background="#F5EAD3">
+
+    <!-- 🔹 上方：分類 + 帳戶 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#EEDFC5">
+
+        <TextView
+            android:id="@+id/tvCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="分類：未選擇"
+            android:textColor="#4A3B2A"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="帳戶：現金"
+            android:textColor="#4A3B2A"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_wallet"
+            android:drawablePadding="8dp" />
+    </LinearLayout>
+
+    <!-- 🔸 支出 / 收入 / 轉帳 Tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:tabMode="fixed"
+        app:tabIndicatorColor="#4A3B2A"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="#4A3B2A"
+        app:tabTextColor="#A8947A"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 🔹 支出／收入分類清單 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerCategories"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:visibility="visible" />
+
+    <!-- 🔹 轉帳用區塊（預設隱藏） -->
+    <LinearLayout
+        android:id="@+id/layoutTransfer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        android:background="#F3E6CA"
+        android:padding="16dp">
+
+        <!-- 左帳戶 -->
+        <!-- 左帳戶 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvFromLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="付款帳戶"
+                android:textColor="#4A3B2A"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <ImageView
+                android:id="@+id/btnFromAccount"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_wallet"
+                android:tint="#4A3B2A"
+                android:background="@drawable/bg_circle_light"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/tvFromAccountName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="未選擇"
+                android:textColor="#4A3B2A"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- 中間箭頭 -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_swap"
+            android:tint="#9C8B6F"
+            android:layout_marginHorizontal="24dp" />
+
+        <!-- 右帳戶 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvToLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="收款帳戶"
+                android:textColor="#4A3B2A"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <ImageView
+                android:id="@+id/btnToAccount"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_wallet"
+                android:tint="#4A3B2A"
+                android:background="@drawable/bg_circle_light"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/tvToAccountName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="未選擇"
+                android:textColor="#4A3B2A"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 🔹 備註、金額與按鈕區（與之前相同） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="#EFE2C7">
+
+        <ImageView
+            android:id="@+id/btnAddNote"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:tint="#4A3B2A"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/etNote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="添加備註"
+            android:background="@android:color/transparent"
+            android:textColor="#4A3B2A"
+            android:textColorHint="#A8947A"
+            android:padding="4dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="#F3E6CA">
+
+        <EditText
+            android:id="@+id/etAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="0"
+            android:inputType="numberDecimal"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#4A3B2A"
+            android:gravity="end"
+            android:background="@android:color/transparent" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="新增記帳"
-            android:textSize="22sp"
+            android:text="TWD"
             android:textColor="#4A3B2A"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="輸入金額"
-            android:inputType="number"
-            android:background="@android:drawable/edit_text"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="備註"
-            android:inputType="text"
-            android:background="@android:drawable/edit_text"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="12dp">
-
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="儲存"
-                android:backgroundTint="#5B6FC7"
-                android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp"/>
-
-            <Button
-                android:id="@+id/btnCancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="取消"
-                android:backgroundTint="#C75B5B"
-                android:textColor="@android:color/white"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
+            android:textSize="18sp"
+            android:layout_marginStart="8dp"/>
     </LinearLayout>
-</ScrollView>
+
+    <Button
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="確認"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:backgroundTint="#C49B61"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="24dp" />
+
+</LinearLayout>

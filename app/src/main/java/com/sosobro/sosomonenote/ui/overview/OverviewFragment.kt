@@ -159,11 +159,32 @@ class OverviewFragment : Fragment() {
 
     /** 💧四個水缸預算 */
     private fun setupBudgetTanks() {
-        binding.waterTankMonth.setLevel(0.6f)   // 月度預算60%
-        binding.waterTankBiMonth.setLevel(0.4f) // 兩月預算40%
-        binding.waterTankQuarter.setLevel(0.75f) // 季度預算75%
-        binding.waterTankYear.setLevel(0.3f)    // 年度預算30%
+        binding.waterTankMonth.setLevel(0.6f)
+        binding.waterTankBiMonth.setLevel(0.4f)
+        binding.waterTankQuarter.setLevel(0.75f)
+        binding.waterTankYear.setLevel(0.3f)
+
+        // ✅ 點擊事件
+        binding.waterTankMonth.setOnClickListener {
+            navigateToBudget("month")
+        }
+        binding.waterTankBiMonth.setOnClickListener {
+            navigateToBudget("bimonth")
+        }
+        binding.waterTankQuarter.setOnClickListener {
+            navigateToBudget("quarter")
+        }
+        binding.waterTankYear.setOnClickListener {
+            navigateToBudget("year")
+        }
     }
+
+    private fun navigateToBudget(type: String) {
+        val intent = android.content.Intent(requireContext(), com.sosobro.sosomonenote.ui.budget.BudgetSettingActivity::class.java)
+        intent.putExtra("BUDGET_TYPE", type)
+        startActivity(intent)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

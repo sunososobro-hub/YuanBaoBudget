@@ -25,10 +25,13 @@ interface AccountDao {
     suspend fun deleteAll()
 
     @Query("SELECT * FROM accounts ORDER BY sortOrder ASC")
-    fun getAllAccountsSorted(): List<AccountEntity>
+    suspend fun getAllAccountsSorted(): List<AccountEntity>
 
     @Query("DELETE FROM accounts WHERE id = :accountId")
     suspend fun deleteById(accountId: Int)
+
+    @Query("SELECT * FROM accounts WHERE name = :name LIMIT 1")
+    suspend fun getAccountByName(name: String): AccountEntity?
 
     @Update
     fun update(account: AccountEntity)

@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_overview">
-<!--
-    <fragment
+
+    <activity
         android:id="@+id/nav_budge"
-        android:name="com.sosobro.sosomonenote.ui.budge.BudgeFragment"
+        android:name="com.sosobro.sosomonenote.ui.budget.BudgetSettingActivity"
         android:label="預算"
-        tools:layout="@layout/fragment_budge" />
--->
+        tools:layout="@layout/activity_budget_setting" />
+
     <activity
         android:id="@+id/nav_import"
         android:name="com.sosobro.sosomonenote.ui.importdata.ImportDataActivity"

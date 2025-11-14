@@ -16,30 +16,38 @@ object DatabaseInstance {
     fun getDatabase(context: Context): AppDatabase {
         return instance ?: synchronized(this) {
 
-            // 🔹 定義 Migration（可擴充）
-            // 若未提供 migration，Room 會根據 fallback 設定處理
-            val builder = Room.databaseBuilder(
+            val newInstance = Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                "history_database"
+                "main_database"
             )
-                // ✅ 開發用：若版本改變，直接清除重建（避免 Room crash）
-                .fallbackToDestructiveMigration()
-
-                // ✅ 可選：監聽資料庫建立完成（如預載資料）
+                .addMigrations(MIGRATION_1_2) // ✅ 使用正確 Migration
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
+
+                        // ⭐ 初始化預設分類
                         CoroutineScope(Dispatchers.IO).launch {
-                            // 這裡可以插入預設分類或帳戶
                             val dao = getDatabase(context).categoryDao()
-                            // 範例：插入初始資料
-                            // dao.insert(CategoryEntity(name = "未分類", type = "支出"))
+
+                            val defaultCategories = listOf(
+                                CategoryEntity(name = "食物", type = "支出"),
+                                CategoryEntity(name = "交通", type = "支出"),
+                                CategoryEntity(name = "娛樂", type = "支出"),
+                                CategoryEntity(name = "購物", type = "支出"),
+                                CategoryEntity(name = "醫療", type = "支出"),
+                                CategoryEntity(name = "薪資", type = "收入"),
+                                CategoryEntity(name = "投資獲利", type = "收入"),
+                                CategoryEntity(name = "轉帳", type = "轉帳"),
+                                CategoryEntity(name = "未分類", type = "支出")
+                            )
+
+                            dao.insertAll(defaultCategories)
                         }
                     }
                 })
+                .build()
 
-            val newInstance = builder.build()
             instance = newInstance
             newInstance
         }

@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val accountId: Int,
-    val recordId: String? = null, // ✅ 補上這一行
-    val date: String,
+    val recordId: String? = null,
+    val date: String,                 // ← 本來要存 yyyy-MM-dd
     val category: String,
     val subCategory: String? = null,
     val type: String,
@@ -29,5 +29,7 @@ data class TransactionEntity(
     val book: String? = null,
     val tag: String? = null,
     val includeInBudget: Boolean = true,
+    val time: Long,                   // ← 正確的交易日期
     val image: String? = null
 )
+

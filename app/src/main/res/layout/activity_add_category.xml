@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4E7D3"
+    android:padding="16dp">
+
+    <!-- 🔹 上方標題列 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#EBD2B5">
+
+        <!-- 返回鍵 -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_back"
+            android:tint="#4A3B2A"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- 標題 -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="新增分類"
+            android:textColor="#4A3B2A"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <!-- 儲存按鈕 -->
+        <ImageView
+            android:id="@+id/btnSave"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_save"
+            android:tint="#4A3B2A"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </RelativeLayout>
+
+    <!-- 🔸 分類名稱輸入 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp"
+        android:background="@drawable/bg_card_light"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="分類名稱"
+            android:textColor="#4A3B2A"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginEnd="12dp" />
+
+        <EditText
+            android:id="@+id/etCategoryName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="請輸入分類名稱"
+            android:textColor="#4A3B2A"
+            android:textColorHint="#A8947A"
+            android:background="@android:color/transparent"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- 🔸 類型選擇（支出 / 收入） -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:tabMode="fixed"
+        app:tabIndicatorColor="#4A3B2A"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="#4A3B2A"
+        app:tabTextColor="#A8947A" />
+
+    <!-- 🔸 已選圖示 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已選圖示："
+            android:textColor="#4A3B2A"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
+
+        <ImageView
+            android:id="@+id/ivSelectedIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_default_category"
+            android:background="@drawable/bg_circle_light"
+            android:padding="8dp"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <!-- 🔸 可選圖示列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerIcons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="32dp" />
+
+</LinearLayout>

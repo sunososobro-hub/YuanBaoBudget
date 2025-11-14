@@ -7,13 +7,16 @@ import androidx.room.RoomDatabase
     entities = [
         AccountEntity::class,
         TransactionEntity::class,
-        CategoryEntity::class // ✅ 別忘了註冊這個
+        CategoryEntity::class,
+        BudgetEntity::class
     ],
-    version = 10, // 🚨 請再升一版，確保 Room 重新建表
+    version = 18,           // ⭐ 使用 Migration → 正常升版
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun accountDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun budgetDao(): BudgetDao
 }
