@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.google.android.material.tabs.TabLayout
+import com.sosobro.sosomonenote.R
 import com.sosobro.sosomonenote.database.DatabaseInstance
 import com.sosobro.sosomonenote.databinding.FragmentAnalysisBinding
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,9 @@ class AnalysisFragment : Fragment() {
     private var _binding: FragmentAnalysisBinding? = null
     private val binding get() = _binding!!
 
+    private var expensesView: View? = null
+    private var incomeView: View? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,10 +40,10 @@ class AnalysisFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadAnalysis()
+        loadData()
     }
 
-    private fun loadAnalysis() {
+    private fun loadData() {
         lifecycleScope.launch {
 
             val context = requireContext()
@@ -46,9 +51,7 @@ class AnalysisFragment : Fragment() {
             val transactionDao = db.transactionDao()
             val categoryDao = db.categoryDao()
 
-            val allCategories = withContext(Dispatchers.IO) {
-                categoryDao.getAll()
-            }
+            val allCategories = withContext(Dispatchers.IO) { categoryDao.getAll() }
 
             // ---- 本月年月字串 ----
             val calendar = Calendar.getInstance()
@@ -60,57 +63,93 @@ class AnalysisFragment : Fragment() {
                 transactionDao.getValidTransactionsForMonth(yearStr, monthStr)
             }
 
-            Log.d("SSS", "查詢 year=$yearStr, month=$monthStr, 共=${monthTransactions.size} 筆")
-
             val expenses = monthTransactions.filter { it.type == "支出" }
             val incomes = monthTransactions.filter { it.type == "收入" }
 
-            setupPieChartExpenses(expenses, allCategories)
-            setupPieChartIncome(incomes, allCategories)
-            setupLineChart(monthTransactions)
+            setupTabs(expenses, incomes, monthTransactions, allCategories)
         }
     }
 
-    // --------------------------- Pie Chart: 支出 ----------------------------
+    // -------------------------------- Tabs --------------------------------
+    private fun setupTabs(
+        expenses: List<com.sosobro.sosomonenote.database.TransactionEntity>,
+        incomes: List<com.sosobro.sosomonenote.database.TransactionEntity>,
+        allTransactions: List<com.sosobro.sosomonenote.database.TransactionEntity>,
+        categories: List<com.sosobro.sosomonenote.database.CategoryEntity>
+    ) {
+
+        val inflater = LayoutInflater.from(requireContext())
+
+        // Load views once
+        if (expensesView == null)
+            expensesView = inflater.inflate(R.layout.tab_expense, null)
+        if (incomeView == null)
+            incomeView = inflater.inflate(R.layout.tab_income, null)
+
+        // 預設：支出
+        binding.tabContainer.removeAllViews()
+        binding.tabContainer.addView(expensesView)
+
+        // 設定圖表
+        setupPieChartExpenses(expenses, categories)
+        setupPieChartIncome(incomes, categories)
+        setupLineChartExpense(expensesView!!, allTransactions)
+        setupLineChartIncome(incomeView!!, allTransactions)
+
+        // -------- Tab 切換 --------
+        binding.tabMode.removeAllTabs()
+        binding.tabMode.addTab(binding.tabMode.newTab().setText("支出"))
+        binding.tabMode.addTab(binding.tabMode.newTab().setText("收入"))
+
+        binding.tabMode.setSelectedTabIndicatorColor(Color.parseColor("#F7D774"))
+        binding.tabMode.setTabTextColors(Color.parseColor("#4A3B2A"), Color.parseColor("#F7D774"))
+
+        binding.tabMode.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                binding.tabContainer.removeAllViews()
+                when (tab.position) {
+                    0 -> binding.tabContainer.addView(expensesView)
+                    1 -> binding.tabContainer.addView(incomeView)
+                }
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    // -------------------------------- 圓餅圖：支出 --------------------------------
     private fun setupPieChartExpenses(
         expenses: List<com.sosobro.sosomonenote.database.TransactionEntity>,
         categories: List<com.sosobro.sosomonenote.database.CategoryEntity>
     ) {
         val total = expenses.sumOf { kotlin.math.abs(it.amount) }
-        if (total == 0.0) {
-            binding.pieExpense.data = null
-            binding.pieExpense.invalidate()
-            return
-        }
+        if (total == 0.0 || expensesView == null) return
+
+        val pie = expensesView!!.findViewById<com.github.mikephil.charting.charts.PieChart>(R.id.pieExpense)
 
         val grouped = expenses.groupBy { it.category }
-            .map { (cat, list) ->
-                val sum = list.sumOf { kotlin.math.abs(it.amount) }
-                PieEntry(sum.toFloat(), cat)
+            .map { (cat, list) -> PieEntry(list.sumOf { kotlin.math.abs(it.amount) }.toFloat(), cat) }
+
+        val dataSet = PieDataSet(grouped, "").apply {
+            colors = listOf(
+                Color.parseColor("#F94144"), Color.parseColor("#F3722C"), Color.parseColor("#F8961E"),
+                Color.parseColor("#F9C74F"), Color.parseColor("#90BE6D"), Color.parseColor("#43AA8B")
+            )
+            sliceSpace = 2f
+            xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            valueLinePart1OffsetPercentage = 80f
+            valueLinePart1Length = 0.4f
+            valueLinePart2Length = 0.6f
+            valueLineColor = Color.GRAY
+        }
+
+        pie.apply {
+            data = PieData(dataSet).apply {
+                setValueTextSize(10f)
+                setValueTextColor(Color.BLACK)
+                setValueFormatter(PercentFormatter(pie))
             }
-
-        val dataSet = PieDataSet(grouped, "")
-        dataSet.colors = listOf(
-            Color.parseColor("#F94144"), Color.parseColor("#F3722C"), Color.parseColor("#F8961E"),
-            Color.parseColor("#F9C74F"), Color.parseColor("#90BE6D"), Color.parseColor("#43AA8B")
-        )
-        dataSet.sliceSpace = 2f
-
-        // ⭐ 標籤移到外面 + 指示線
-        dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        dataSet.valueLinePart1OffsetPercentage = 80f
-        dataSet.valueLinePart1Length = 0.4f
-        dataSet.valueLinePart2Length = 0.6f
-        dataSet.valueLineColor = Color.GRAY
-
-        val pieData = PieData(dataSet)
-        pieData.setValueTextSize(10f)
-        pieData.setValueTextColor(Color.BLACK)
-        pieData.setValueFormatter(PercentFormatter(binding.pieExpense))
-
-        binding.pieExpense.apply {
-            data = pieData
             setUsePercentValues(true)
             description.isEnabled = false
             legend.orientation = Legend.LegendOrientation.HORIZONTAL
@@ -121,46 +160,39 @@ class AnalysisFragment : Fragment() {
         }
     }
 
-    // --------------------------- Pie Chart: 收入 ----------------------------
+    // -------------------------------- 圓餅圖：收入 --------------------------------
     private fun setupPieChartIncome(
         incomes: List<com.sosobro.sosomonenote.database.TransactionEntity>,
         categories: List<com.sosobro.sosomonenote.database.CategoryEntity>
     ) {
         val total = incomes.sumOf { it.amount }
-        if (total == 0.0) {
-            binding.pieIncome.data = null
-            binding.pieIncome.invalidate()
-            return
-        }
+        if (total == 0.0 || incomeView == null) return
+
+        val pie = incomeView!!.findViewById<com.github.mikephil.charting.charts.PieChart>(R.id.pieIncome)
 
         val grouped = incomes.groupBy { it.category }
-            .map { (cat, list) ->
-                val sum = list.sumOf { it.amount }
-                PieEntry(sum.toFloat(), cat)
+            .map { (cat, list) -> PieEntry(list.sumOf { it.amount }.toFloat(), cat) }
+
+        val dataSet = PieDataSet(grouped, "").apply {
+            colors = listOf(
+                Color.parseColor("#4cc9f0"), Color.parseColor("#4895ef"), Color.parseColor("#4361ee"),
+                Color.parseColor("#3a0ca3"), Color.parseColor("#7209b7"), Color.parseColor("#f72585")
+            )
+            sliceSpace = 2f
+            xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            valueLinePart1OffsetPercentage = 80f
+            valueLinePart1Length = 0.4f
+            valueLinePart2Length = 0.6f
+            valueLineColor = Color.GRAY
+        }
+
+        pie.apply {
+            data = PieData(dataSet).apply {
+                setValueTextSize(10f)
+                setValueTextColor(Color.BLACK)
+                setValueFormatter(PercentFormatter(pie))
             }
-
-        val dataSet = PieDataSet(grouped, "")
-        dataSet.colors = listOf(
-            Color.parseColor("#4cc9f0"), Color.parseColor("#4895ef"), Color.parseColor("#4361ee"),
-            Color.parseColor("#3a0ca3"), Color.parseColor("#7209b7"), Color.parseColor("#f72585")
-        )
-        dataSet.sliceSpace = 2f
-
-        // ⭐ 標籤移到外面 + 指示線
-        dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        dataSet.valueLinePart1OffsetPercentage = 80f
-        dataSet.valueLinePart1Length = 0.4f
-        dataSet.valueLinePart2Length = 0.6f
-        dataSet.valueLineColor = Color.GRAY
-
-        val pieData = PieData(dataSet)
-        pieData.setValueTextSize(10f)
-        pieData.setValueTextColor(Color.BLACK)
-        pieData.setValueFormatter(PercentFormatter(binding.pieIncome))
-
-        binding.pieIncome.apply {
-            data = pieData
             setUsePercentValues(true)
             description.isEnabled = false
             legend.orientation = Legend.LegendOrientation.HORIZONTAL
@@ -171,17 +203,29 @@ class AnalysisFragment : Fragment() {
         }
     }
 
-    // --------------------------- Line Chart: 支出 + 收入 ----------------------------
-    private fun setupLineChart(
+    // -------------------------------- 折線圖：支出 --------------------------------
+    private fun setupLineChartExpense(view: View, all: List<com.sosobro.sosomonenote.database.TransactionEntity>) {
+        val chart = view.findViewById<com.github.mikephil.charting.charts.LineChart>(R.id.lineChartExpense)
+        setupLineChartInternal(chart, all)
+    }
+
+    // -------------------------------- 折線圖：收入 --------------------------------
+    private fun setupLineChartIncome(view: View, all: List<com.sosobro.sosomonenote.database.TransactionEntity>) {
+        val chart = view.findViewById<com.github.mikephil.charting.charts.LineChart>(R.id.lineChartIncome)
+        setupLineChartInternal(chart, all)
+    }
+
+    // -------------------------------- 共享折線圖 --------------------------------
+    private fun setupLineChartInternal(
+        chart: com.github.mikephil.charting.charts.LineChart,
         list: List<com.sosobro.sosomonenote.database.TransactionEntity>
     ) {
         if (list.isEmpty()) {
-            binding.lineChart.clear()
+            chart.clear()
             return
         }
 
         val df = SimpleDateFormat("dd", Locale.getDefault())
-
         val expenseEntries = ArrayList<Entry>()
         val incomeEntries = ArrayList<Entry>()
 
@@ -210,10 +254,8 @@ class AnalysisFragment : Fragment() {
             lineWidth = 2f
         }
 
-        val lineData = LineData(expenseSet, incomeSet)
-
-        binding.lineChart.apply {
-            data = lineData
+        chart.apply {
+            data = LineData(expenseSet, incomeSet)
             description.isEnabled = false
             xAxis.position = XAxis.XAxisPosition.BOTTOM
             axisRight.isEnabled = false

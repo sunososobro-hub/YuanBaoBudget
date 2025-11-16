@@ -8,10 +8,31 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="cute_primary">#A67C52</color>       <!-- 奶茶棕 -->
-    <color name="cute_secondary">#D8A47F</color>     <!-- 蜂蜜奶茶 -->
-    <color name="cute_accent_blue">#6EB5C0</color>   <!-- 薄荷藍 -->
-    <color name="cute_pink">#F4A6B5</color>          <!-- 櫻花粉 -->
-    <color name="cute_bg">#FFF8F1</color>            <!-- 奶油米白 -->
-    <color name="cute_text_dark">#4A3B2A</color>     <!-- 深可可 -->
+    <color name="cute_primary">#A67C52</color>
+    <color name="cute_secondary">#D8A47F</color>
+    <color name="cute_accent_blue">#6EB5C0</color>
+    <color name="cute_pink">#F4A6B5</color>
+    <color name="cute_bg">#FFF8F1</color>
+    <color name="cute_primary_yellow">#F6D878</color>
+    <color name="cute_secondary_orange">#F2B94B</color>
+    <color name="cute_blue">#6A8DFF</color>
+
+    <color name="cute_bg_yellow">#FFF8E9</color>
+    <color name="cute_card">#FFFFFF</color>
+    <color name="cute_text_dark">#4A3B2A</color>
+
+    <color name="yuanbao_primary">#F7D24C</color>
+    <color name="yuanbao_primary_dark">#E0B93B</color>
+    <color name="yuanbao_secondary">#FFD86C</color>
+    <color name="yuanbao_bg">#FFF9E6</color>
+    <color name="yuanbao_white">#FFFFFF</color>
+    <color name="yuanbao_text_dark">#333333</color>
+    <color name="yuanbao_text_light">#666666</color>
+    <color name="yuanbao_accent_blue">#7DA2F8</color>
+
+    <color name="tab_unselected_bg">#E8E6E2</color>
+    <color name="tab_selected_bg">#4D4A47</color>
+    <color name="tab_unselected_text">#6E6A67</color>
+    <color name="tab_selected_text">#FFFFFF</color>
+
 </resources>

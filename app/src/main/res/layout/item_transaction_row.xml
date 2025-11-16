@@ -4,61 +4,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp">
+    android:padding="8dp">
 
-    <!-- 日期（左側） -->
-    <TextView
-        android:id="@+id/tvDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10月 31"
-        android:textSize="14sp"
-        android:textColor="#6A6A6A"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- 交易名稱（分類 + 商店） -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="行動轉出 - 00018000xxxx807"
+        android:text="餐飲"
         android:textSize="16sp"
-        android:textColor="#222222"
-        app:layout_constraintStart_toEndOf="@id/tvDate"
-        android:layout_marginStart="16dp"
+        android:textColor="#4A3B2A"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tvAmount"/>
 
-    <!-- 帳戶名稱 / 卡片資訊 -->
     <TextView
         android:id="@+id/tvAccount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="元大｜綜合活儲－一般戶"
-        android:textColor="#888888"
-        android:textSize="13sp"
+        android:text="元大｜一般戶"
+        android:textSize="12sp"
+        android:textColor="#777777"
         app:layout_constraintStart_toStartOf="@id/tvTitle"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintEnd_toEndOf="@id/tvTitle"/>
 
-    <!-- 金額（右側） -->
     <TextView
         android:id="@+id/tvAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="-35,000"
-        android:textSize="18sp"
+        android:text="-500"
         android:textStyle="bold"
+        android:textSize="18sp"
         android:textColor="#C62828"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#DDDDDD"
-        app:layout_constraintTop_toBottomOf="@id/tvAccount"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

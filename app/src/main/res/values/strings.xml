@@ -11,6 +11,7 @@
     <string name="menu_import">資料導入</string>
     <string name="menu_cata_setting">分類設置</string>
     <string name="menu_data_sync">雲端同步</string>
+    <string name="menu_contact_us">聯絡我們</string>
     <string name="menu_delete">刪除所有資料</string>
 
 

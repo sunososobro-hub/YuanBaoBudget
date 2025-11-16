@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4E7D3"
+    android:background="@color/yuanbao_bg"
     tools:context=".ui.accounttype.AccountTypeActivity">
 
     <LinearLayout
@@ -12,29 +12,34 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 標題列 -->
+        <!-- 🟡 元寶 AppBar 簡易版 -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_height="56dp"
+            android:background="@color/yuanbao_primary"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_add"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back"
+                android:tint="@color/yuanbao_white"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="返回" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="帳戶類型"
-                android:textSize="20sp"
+                android:textColor="@color/yuanbao_white"
                 android:textStyle="bold"
-                android:textColor="#4A3B2A"
+                android:textSize="18sp"
                 android:layout_centerInParent="true" />
         </RelativeLayout>
+
 
         <!-- 儲蓄帳戶 -->
         <TextView
@@ -43,14 +48,16 @@
             android:text="儲蓄帳戶"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="#4A3B2A"
+            android:textColor="@color/yuanbao_text_dark"
             android:layout_marginBottom="8dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerSaving"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="8dp" />
+
 
         <!-- 信用帳戶 -->
         <TextView
@@ -59,7 +66,7 @@
             android:text="信用帳戶"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="#4A3B2A"
+            android:textColor="@color/yuanbao_text_dark"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="8dp" />
 
@@ -67,6 +74,8 @@
             android:id="@+id/recyclerCredit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="8dp" />
+
     </LinearLayout>
 </ScrollView>

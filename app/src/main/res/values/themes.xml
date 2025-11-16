@@ -1,35 +1,61 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme -->
-    <style name="Theme.SoSoMoneNote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand colors -->
-        <item name="colorPrimary">#D7BFA8</item>
-        <item name="colorPrimaryVariant">#C0A68C</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
-        <!-- Secondary brand colors -->
-        <item name="colorSecondary">#E4C9AA</item>
-        <item name="colorSecondaryVariant">#C0A68C</item>
-        <item name="colorOnSecondary">#000000</item>
-
-        <!-- Background color -->
-        <item name="android:colorBackground">#F2E4CF</item> <!-- ✅ 修正這行 -->
-
-        <!-- Status bar color -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-
-        <!-- Other UI settings -->
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-
-    <!-- NoActionBar variant -->
     <style name="Theme.SoSoMoneNote.NoActionBar" parent="Theme.SoSoMoneNote">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- Toolbar overlay -->
-    <style name="Theme.SoSoMoneNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.SoSoMoneNote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
-    <!-- Popup overlay -->
-    <style name="Theme.SoSoMoneNote.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+        <item name="colorPrimary">@color/yuanbao_primary</item>
+        <item name="colorPrimaryVariant">@color/yuanbao_primary_dark</item>
+        <item name="colorSecondary">@color/yuanbao_secondary</item>
+
+        <item name="android:colorBackground">@color/yuanbao_bg</item>
+        <item name="android:textColorPrimary">@color/yuanbao_text_dark</item>
+
+        <item name="actionBarTheme">@style/YuanBaoActionBar</item>
+        <item name="android:statusBarColor">@color/yuanbao_primary_dark</item>
+
+        <item name="materialButtonStyle">@style/YuanBaoButton</item>
+    </style>
+
+    <style name="YuanBaoActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="colorPrimary">@color/yuanbao_primary</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <style name="YuanBaoCard">
+        <item name="android:background">@color/yuanbao_white</item>
+        <item name="android:elevation">6dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:layout_margin">12dp</item>
+        <item name="android:backgroundTint">@color/yuanbao_white</item>
+        <item name="shapeAppearanceOverlay">@style/YuanBaoRound20</item>
+    </style>
+
+    <style name="YuanBaoIcon">
+        <item name="android:tint">@color/yuanbao_accent_blue</item>
+    </style>
+
+    <style name="YuanBaoButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/yuanbao_primary</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="shapeAppearanceOverlay">@style/YuanBaoRound20</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="YuanBaoRound20">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="Theme.SoSoMoneNote.AppBarOverlay"
+        parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+
+    <style name="Theme.SoSoMoneNote.PopupOverlay"
+        parent="ThemeOverlay.MaterialComponents.Light" />
+
 </resources>

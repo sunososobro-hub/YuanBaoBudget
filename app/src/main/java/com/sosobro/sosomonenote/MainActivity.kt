@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -26,6 +27,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.sosobro.sosomonenote.database.DatabaseInstance
 import com.sosobro.sosomonenote.databinding.ActivityMainBinding
+import com.sosobro.sosomonenote.ui.importdata.ImportDataActivity
 import com.sosobro.sosomonenote.ui.record.RecordActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +40,15 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 1001
+
+    private val importDataLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK &&
+                result.data?.getBooleanExtra("DATA_UPDATED", false) == true
+            ) {
+                supportFragmentManager.setFragmentResult("DATA_UPDATED", Bundle())
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,43 +75,45 @@ class MainActivity : AppCompatActivity() {
         )
 
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        // ⭐ 正確：綁定 NavigationView / BottomNavigation
         navView.setupWithNavController(navController)
         binding.appBarMain.bottomNav.setupWithNavController(navController)
 
-        binding.appBarMain.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_overview -> {
-                    navController.navigate(R.id.nav_overview)
-                    true
-                }
-                R.id.nav_account -> {
-                    navController.navigate(R.id.nav_account)
-                    true
-                }
-                R.id.nav_analysis -> {
-                    navController.navigate(R.id.nav_analysis)
-                    true
-                }
-                R.id.nav_report -> {
-                    navController.navigate(R.id.nav_report)
-                    true
-                }
-                else -> false
-            }
-        }
+        // ⭐ 你原本多餘的 OnItemSelectedListener → 移除（此行會讓 FAB 跑掉）
+        // ❌ 已刪除，FAB 才會回到中間正確位置
 
-        val fabAdd: FloatingActionButton = findViewById(R.id.fab_add)
+        // ----------------------------------------------------
+        // ⭐ FAB
+        // ----------------------------------------------------
+        val fabAdd: ImageView = findViewById(R.id.fab_add)
         fabAdd.setOnClickListener {
-            val intent = Intent(this, RecordActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RecordActivity::class.java))
         }
 
+        // ----------------------------------------------------
+        // ⭐ Drawer Menu
+        // ----------------------------------------------------
         binding.navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+
+                R.id.nav_import_data -> {
+                    startActivity(Intent(this, ImportDataActivity::class.java))
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
+
                 R.id.nav_delete_all -> {
                     showDeleteAllDialog()
                     true
                 }
+
+                R.id.nav_contact_us -> {
+                    openContactEmail()
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
+
                 else -> {
                     NavigationUI.onNavDestinationSelected(menuItem, navController)
                     binding.drawerLayout.closeDrawers()
@@ -109,31 +122,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // ✅ 初始化 Google 登入
+        // ----------------------------------------------------
+        // ⭐ Google Sign-In
+        // ----------------------------------------------------
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // ✅ Navigation Header 控制項
         val headerView = binding.navView.getHeaderView(0)
         val imageView = headerView.findViewById<ImageView>(R.id.imageView)
         val nameView = headerView.findViewById<TextView>(R.id.textView)
         val emailView = headerView.findViewById<TextView>(R.id.textView2)
         val tipView = headerView.findViewById<TextView>(R.id.nav_header_title)
 
-        // ✅ 自動顯示登入狀態
         val account = GoogleSignIn.getLastSignedInAccount(this)
         if (account != null) {
             updateUserUI(account, imageView, nameView, emailView)
         }
 
-        // ✅ 點擊頭像：登入 / 登出
         imageView.setOnClickListener {
             val currentAccount = GoogleSignIn.getLastSignedInAccount(this)
-            val tipView = headerView.findViewById<TextView>(R.id.nav_header_title)
             if (currentAccount != null) {
-                // 已登入 → 登出
                 googleSignInClient.signOut().addOnCompleteListener {
                     nameView.text = "未登入"
                     emailView.text = ""
@@ -142,14 +152,33 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "已登出", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                // 未登入 → 登入
                 val signInIntent = googleSignInClient.signInIntent
                 startActivityForResult(signInIntent, RC_SIGN_IN)
             }
         }
 
-
         tipView.text = "點擊頭像以登出"
+    }
+
+    // -------------------------------------------------------------
+    // ⭐ 寄信功能（聯絡我們）
+    // -------------------------------------------------------------
+    private fun openContactEmail() {
+
+        val email = "你的信箱@gmail.com" // ← 這裡換成你的信箱
+
+        val uri = android.net.Uri.parse("mailto:$email")
+
+        val intent = Intent(Intent.ACTION_SENDTO, uri).apply {
+            putExtra(Intent.EXTRA_SUBJECT, "SoSoMoneNote - 聯絡我們")
+            putExtra(Intent.EXTRA_TEXT, "您好，我想詢問：\n\n")
+        }
+
+        try {
+            startActivity(Intent.createChooser(intent, "選擇寄件應用程式"))
+        } catch (e: Exception) {
+            Toast.makeText(this, "未找到可用的郵件 App", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

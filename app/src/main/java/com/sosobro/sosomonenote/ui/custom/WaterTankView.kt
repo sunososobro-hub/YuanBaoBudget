@@ -7,6 +7,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.sosobro.sosomonenote.R
 
 class WaterTankView @JvmOverloads constructor(
     context: Context,
@@ -17,30 +19,42 @@ class WaterTankView @JvmOverloads constructor(
     private var fillLevel = 0f
     private var targetLevel = 0f
 
+    private val colorWaterLow = ContextCompat.getColor(context, R.color.yuanbao_accent_blue)
+    private val colorWaterMid = ContextCompat.getColor(context, R.color.yuanbao_primary)
+    private val colorWaterHigh = ContextCompat.getColor(context, R.color.yuanbao_primary_dark)
+
+    private val colorBorder = ContextCompat.getColor(context, R.color.yuanbao_primary_dark)
+    private val colorBg = ContextCompat.getColor(context, R.color.yuanbao_bg)
+    private val colorText = ContextCompat.getColor(context, R.color.yuanbao_text_dark)
+
     private val paintWater = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#5B9BD5")
         style = Paint.Style.FILL
     }
     private val paintBorder = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#666666")
+        color = colorBorder
         style = Paint.Style.STROKE
-        strokeWidth = 5f
+        strokeWidth = 6f
+    }
+    private val paintBg = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = colorBg
+        style = Paint.Style.FILL
     }
     private val paintText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.DKGRAY
+        color = colorText
         textSize = 42f
         textAlign = Paint.Align.CENTER
     }
 
     fun setLevel(percent: Float) {
         targetLevel = percent.coerceIn(0f, 1f)
-        val animator = ValueAnimator.ofFloat(fillLevel, targetLevel)
-        animator.duration = 1200
-        animator.addUpdateListener {
-            fillLevel = it.animatedValue as Float
-            invalidate()
+        ValueAnimator.ofFloat(fillLevel, targetLevel).apply {
+            duration = 1200
+            addUpdateListener {
+                fillLevel = it.animatedValue as Float
+                invalidate()
+            }
+            start()
         }
-        animator.start()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -48,21 +62,19 @@ class WaterTankView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
 
-        // 水缸邊框
-        canvas.drawRoundRect(5f, 5f, w - 5f, h - 5f, 25f, 25f, paintBorder)
+        canvas.drawRoundRect(5f, 5f, w - 5f, h - 5f, 25f, 25f, paintBg)
 
-        // 水位顏色依比例變化
         paintWater.color = when {
-            fillLevel < 0.5f -> Color.parseColor("#5B9BD5") // 藍
-            fillLevel < 0.8f -> Color.parseColor("#FFC107") // 黃
-            else -> Color.parseColor("#F44336") // 紅
+            fillLevel < 0.5f -> colorWaterLow
+            fillLevel < 0.8f -> colorWaterMid
+            else -> colorWaterHigh
         }
 
-        // 畫水面
         val top = h * (1 - fillLevel)
         canvas.drawRoundRect(5f, top, w - 5f, h - 5f, 25f, 25f, paintWater)
 
-        // 百分比文字
+        canvas.drawRoundRect(5f, 5f, w - 5f, h - 5f, 25f, 25f, paintBorder)
+
         val text = "${(fillLevel * 100).toInt()}%"
         canvas.drawText(text, w / 2, h / 2, paintText)
     }

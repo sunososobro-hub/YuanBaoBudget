@@ -12,7 +12,7 @@
         tools:layout="@layout/activity_budget_setting" />
 
     <activity
-        android:id="@+id/nav_import"
+        android:id="@+id/nav_import_data"
         android:name="com.sosobro.sosomonenote.ui.importdata.ImportDataActivity"
         android:label="匯入"
         tools:layout="@layout/activity_import_data" />
@@ -39,14 +39,11 @@
     <fragment
         android:id="@+id/nav_analysis"
         android:name="com.sosobro.sosomonenote.ui.analysis.AnalysisFragment"
-        android:label="報表"
         tools:layout="@layout/fragment_analysis" />
 
-    <!-- 報表 -->
     <fragment
         android:id="@+id/nav_report"
         android:name="com.sosobro.sosomonenote.ui.report.ReportFragment"
-        android:label="報表"
         tools:layout="@layout/fragment_report" />
 
     <activity

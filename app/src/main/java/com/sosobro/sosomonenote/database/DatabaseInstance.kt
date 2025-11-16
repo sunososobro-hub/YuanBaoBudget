@@ -4,9 +4,22 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.migration.Migration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+// ⭐ 全版本適用的 Migration（1 → 18）
+val MIGRATION_ALL = object : Migration(1, 18) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            ALTER TABLE accounts 
+            ADD COLUMN sortOrder INTEGER NOT NULL DEFAULT 0
+            """
+        )
+    }
+}
 
 object DatabaseInstance {
 
@@ -16,19 +29,30 @@ object DatabaseInstance {
     fun getDatabase(context: Context): AppDatabase {
         return instance ?: synchronized(this) {
 
-            val newInstance = Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java,
-                "main_database"
-            )
-                .addMigrations(MIGRATION_1_2) // ✅ 使用正確 Migration
-                .addCallback(object : RoomDatabase.Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
+            // 再次檢查，避免多執行緒重複建立
+            instance ?: buildDatabase(context).also { instance = it }
+        }
+    }
 
-                        // ⭐ 初始化預設分類
+    private fun buildDatabase(context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "main_database"
+        )
+            .addMigrations(MIGRATION_ALL)
+            .addCallback(object : RoomDatabase.Callback() {
+
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+
+                    // ⭐ 若在這裡直接呼叫 getDatabase 會造成循環！！
+                    // 因此使用 instance（已建立）
+                    instance?.let { database ->
+
                         CoroutineScope(Dispatchers.IO).launch {
-                            val dao = getDatabase(context).categoryDao()
+
+                            val dao = database.categoryDao()
 
                             val defaultCategories = listOf(
                                 CategoryEntity(name = "食物", type = "支出"),
@@ -45,11 +69,8 @@ object DatabaseInstance {
                             dao.insertAll(defaultCategories)
                         }
                     }
-                })
-                .build()
-
-            instance = newInstance
-            newInstance
-        }
+                }
+            })
+            .build()
     }
 }

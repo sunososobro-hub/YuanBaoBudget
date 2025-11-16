@@ -2,9 +2,7 @@ package com.sosobro.sosomonenote.ui.overview
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.LineChart
@@ -12,11 +10,12 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.sosobro.sosomonenote.R
-import com.sosobro.sosomonenote.database.DatabaseInstance
+import com.google.android.material.tabs.TabLayout
 import com.sosobro.sosomonenote.databinding.FragmentOverviewBinding
+import com.sosobro.sosomonenote.database.DatabaseInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,128 +35,187 @@ class OverviewFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         setupLineChart(binding.lineChart)
-        loadOverviewData()
+        setupTabs()
+
+        loadSummary()
+        load30DayOverview()
         setupBudgetTanks()
+
+        parentFragmentManager.setFragmentResultListener("DATA_UPDATED", this) { _, _ ->
+            loadSummary()
+            load30DayOverview()
+        }
     }
 
+    /** ----------------------------
+     *  淨資產 Summary 計算
+     *  ---------------------------- */
+    private fun loadSummary() {
+        lifecycleScope.launch {
+            val db = DatabaseInstance.getDatabase(requireContext())
+            val accounts = withContext(Dispatchers.IO) { db.accountDao().getAllAccounts() }
+
+            var asset = 0.0
+            var debt = 0.0
+
+            accounts.forEach {
+                if (it.balance >= 0) asset += it.balance
+                else debt += it.balance
+            }
+
+            binding.layoutSummary.tvAssets.text = "NT$${"%,.0f".format(asset)}"
+            binding.layoutSummary.tvDebt.text = "NT$${"%,.0f".format(debt)}"
+            binding.layoutSummary.tvNetAssets.text = "NT$${"%,.0f".format(asset + debt)}"
+        }
+    }
+
+    /** ----------------------------
+     *  Tab 設定
+     *  ---------------------------- */
+    private fun setupTabs() {
+        binding.tabMode.removeAllTabs()
+        binding.tabMode.addTab(binding.tabMode.newTab().setText("近30日"))
+        binding.tabMode.addTab(binding.tabMode.newTab().setText("上個月"))
+
+        binding.tabMode.setSelectedTabIndicatorColor(Color.parseColor("#F7D774"))
+        binding.tabMode.setTabTextColors(Color.parseColor("#4A3B2A"), Color.parseColor("#F7D774"))
+
+        binding.tabMode.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                when (tab.position) {
+                    0 -> load30DayOverview()
+                    1 -> loadLastMonthOverview()
+                }
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    /** ----------------------------
+     *  折線圖初始化
+     *  ---------------------------- */
     private fun setupLineChart(chart: LineChart) {
         chart.apply {
             description.isEnabled = false
             legend.isEnabled = false
             setTouchEnabled(true)
             setPinchZoom(true)
-            setDrawGridBackground(false)
             axisRight.isEnabled = false
-            extraBottomOffset = 10f
 
-            val daysInMonth = 31
-            val dayLabels = (1..daysInMonth).map { "${it}日" }
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.textColor = Color.parseColor("#4A3B2A")
+            xAxis.setDrawGridLines(false)
 
-            marker = CustomMarkerView(requireContext(), R.layout.marker_view, dayLabels)
-
-            xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
-                textColor = Color.parseColor("#4A3B2A")
-                textSize = 12f
-                granularity = 1f
-                axisLineColor = Color.parseColor("#CCCCCC")
-                valueFormatter = IndexAxisValueFormatter(dayLabels)
-            }
-
-            axisLeft.apply {
-                textColor = Color.parseColor("#4A3B2A")
-                setDrawGridLines(true)
-                gridColor = Color.parseColor("#DDDDDD")
-                axisLineColor = Color.parseColor("#CCCCCC")
-                setLabelCount(6, true)
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        return if (value >= 1_000_000) {
-                            "NT$${String.format("%.1fM", value / 1_000_000)}"
-                        } else {
-                            "NT$${"%,.0f".format(value)}"
-                        }
-                    }
+            axisLeft.textColor = Color.parseColor("#4A3B2A")
+            axisLeft.gridColor = Color.parseColor("#E0E0E0")
+            axisLeft.valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return "NT$${"%,.0f".format(value)}"
                 }
             }
-
-            setViewPortOffsets(80f, 40f, 80f, 40f)
         }
     }
 
-    private fun loadOverviewData() {
+    /** ----------------------------
+     *  折線圖：近 30 日
+     *  ---------------------------- */
+    private fun load30DayOverview() {
         lifecycleScope.launch {
             val db = DatabaseInstance.getDatabase(requireContext())
 
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH) + 1
-            val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val accounts = withContext(Dispatchers.IO) { db.accountDao().getAllAccounts() }
+            var balance = accounts.sumOf { it.balance }.toFloat()
 
-            val allAccounts = withContext(Dispatchers.IO) { db.accountDao().getAllAccounts() }
-            val startOfMonth = "%04d-%02d-01".format(year, month)
+            val labels = mutableListOf<String>()
+            val values = mutableListOf<Float>()
 
-            val previousTransactions = withContext(Dispatchers.IO) {
-                db.transactionDao().getTransactionsBeforeDate(startOfMonth)
+            for (i in 29 downTo 0) {
+                val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -i) }
+                labels.add("${cal.get(Calendar.MONTH) + 1}/${cal.get(Calendar.DAY_OF_MONTH)}")
+
+                val dateStr = "%04d-%02d-%02d".format(
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.DAY_OF_MONTH)
+                )
+
+                val daily = withContext(Dispatchers.IO) { db.transactionDao().getTransactionsByDate(dateStr) }
+                val income = daily.filter { it.type == "收入" }.sumOf { it.amount }
+                val expense = daily.filter { it.type == "支出" }.sumOf { it.amount }
+
+                balance += (income - expense).toFloat()
+                values.add(balance)
             }
 
-            var initialTotal = allAccounts.sumOf { it.balance }
-            previousTransactions.forEach {
-                if (it.type == "收入") initialTotal -= it.amount
-                else if (it.type == "支出") initialTotal += it.amount
-            }
-
-            val monthTransactions = withContext(Dispatchers.IO) {
-                db.transactionDao().getTransactionsForMonth(year, month)
-            }
-
-            val assetPerDay = mutableListOf<Float>()
-            var runningTotal = initialTotal.toFloat()
-
-            for (day in 1..daysInMonth) {
-                val dayStr = "%04d-%02d-%02d".format(year, month, day)
-                val dailyTransactions = monthTransactions.filter { it.date.startsWith(dayStr) }
-
-                val income = dailyTransactions.filter { it.type == "收入" }.sumOf { it.amount }
-                val expense = dailyTransactions.filter { it.type == "支出" }.sumOf { it.amount }
-
-                runningTotal += (income - expense).toFloat()
-                assetPerDay.add(runningTotal)
-            }
-
-            withContext(Dispatchers.Main) {
-                binding.tvTotalAssets.text = "NT$${"%,.0f".format(runningTotal)}"
-
-                val entries = assetPerDay.mapIndexed { index, value -> Entry(index.toFloat(), value) }
-                if (entries.isEmpty()) {
-                    binding.lineChart.clear()
-                    binding.lineChart.invalidate()
-                    return@withContext
-                }
-
-                val dataSet = LineDataSet(entries, "本月資產變化").apply {
-                    color = Color.parseColor("#5B6FC7")
-                    setCircleColor(Color.parseColor("#A67C52"))
-                    lineWidth = 2f
-                    circleRadius = 3f
-                    valueTextColor = Color.TRANSPARENT
-                    mode = LineDataSet.Mode.CUBIC_BEZIER
-                }
-
-                binding.lineChart.data = LineData(dataSet)
-                val minY = assetPerDay.minOrNull() ?: 0f
-                val maxY = assetPerDay.maxOrNull() ?: 0f
-                binding.lineChart.axisLeft.axisMinimum = minY * 0.98f
-                binding.lineChart.axisLeft.axisMaximum = maxY * 1.02f
-                binding.lineChart.invalidate()
-            }
+            drawLineChart(values, labels)
         }
     }
 
-    /** 💧四個水缸預算 */
+    /** ----------------------------
+     *  折線圖：上個月
+     *  ---------------------------- */
+    private fun loadLastMonthOverview() {
+        lifecycleScope.launch {
+            val db = DatabaseInstance.getDatabase(requireContext())
+
+            val cal = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }
+            val year = cal.get(Calendar.YEAR)
+            val month = cal.get(Calendar.MONTH) + 1
+            val maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+            val accounts = withContext(Dispatchers.IO) { db.accountDao().getAllAccounts() }
+            var balance = accounts.sumOf { it.balance }.toFloat()
+
+            val labels = mutableListOf<String>()
+            val values = mutableListOf<Float>()
+
+            for (day in 1..maxDay) {
+                val dateStr = "%04d-%02d-%02d".format(year, month, day)
+                labels.add("$month/$day")
+
+                val daily = withContext(Dispatchers.IO) { db.transactionDao().getTransactionsByDate(dateStr) }
+                val income = daily.filter { it.type == "收入" }.sumOf { it.amount }
+                val expense = daily.filter { it.type == "支出" }.sumOf { it.amount }
+
+                balance += (income - expense).toFloat()
+                values.add(balance)
+            }
+
+            drawLineChart(values, labels)
+        }
+    }
+
+    /** ----------------------------
+     *  折線圖繪製
+     *  ---------------------------- */
+    private fun drawLineChart(values: List<Float>, labels: List<String>) {
+        val entries = values.mapIndexed { index, v -> Entry(index.toFloat(), v) }
+
+        val dataSet = LineDataSet(entries, "").apply {
+            color = Color.parseColor("#5B6FC7")
+            setCircleColor(Color.parseColor("#5B6FC7"))
+            lineWidth = 3f
+            circleRadius = 4.5f
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            valueTextColor = Color.TRANSPARENT
+
+            setDrawFilled(true)
+            fillColor = Color.parseColor("#5B6FC7")
+            fillAlpha = 80
+        }
+
+        binding.lineChart.apply {
+            xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+            data = LineData(dataSet)
+            invalidate()
+        }
+    }
+
+    /** ----------------------------
+     *  預算水缸
+     *  ---------------------------- */
     private fun setupBudgetTanks() {
         binding.waterTankMonth.setLevel(0.6f)
         binding.waterTankBiMonth.setLevel(0.4f)
@@ -184,7 +242,6 @@ class OverviewFragment : Fragment() {
         intent.putExtra("BUDGET_TYPE", type)
         startActivity(intent)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SoSoMoneNote"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,40 +29,51 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.record.RecordActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+
         <activity
             android:name=".ui.addaccount.AddAccountActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+
         <activity
             android:name=".ui.accounttype.AccountTypeActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote.NoActionBar" />
+
         <activity
             android:name=".ui.account.AccountDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-        <activity android:name=".ui.importdata.ImportDataActivity"
+
+        <activity
+            android:name=".ui.importdata.ImportDataActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.category.CategorySettingActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote" />
+
         <activity
             android:name=".ui.transaction.TransactionDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote" />
+
         <activity
             android:name=".ui.category.AddCategoryActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote" />
+
         <activity
             android:name=".ui.budget.BudgetSettingActivity"
             android:exported="false"
             android:theme="@style/Theme.SoSoMoneNote" />
+
         <activity
             android:name=".ui.budget.AddBudgetActivity"
             android:exported="false"

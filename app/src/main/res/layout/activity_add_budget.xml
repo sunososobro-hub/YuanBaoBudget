@@ -1,42 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#FDF6EC">
+    android:background="@color/yuanbao_bg">
 
-    <!-- 標題列 -->
-    <LinearLayout
+    <!-- 🟡 元寶 AppBar -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:background="@color/yuanbao_primary">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:src="@drawable/ic_back"
-            android:tint="#4A3B2A"
-            android:contentDescription="返回" />
+            android:tint="@color/yuanbao_white"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="新增分類預算"
-            android:textColor="#4A3B2A"
+            android:textColor="@color/yuanbao_white"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center" />
-    </LinearLayout>
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-    <!-- 分類選擇 -->
+    <!-- 標題：選擇分類 -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="選擇分類"
-        android:textColor="#4A3B2A"
+        android:textColor="@color/yuanbao_text_dark"
         android:textSize="16sp"
-        android:layout_marginTop="24dp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -45,35 +49,39 @@
         android:layout_height="wrap_content"
         android:overScrollMode="never" />
 
-    <!-- 輸入預算金額 -->
+    <!-- 標題：設定預算金額 -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="設定預算金額"
-        android:textColor="#4A3B2A"
+        android:textColor="@color/yuanbao_text_dark"
         android:textSize="16sp"
+        android:textStyle="bold"
         android:layout_marginTop="24dp" />
 
+    <!-- 預算輸入框（元寶卡片風） -->
     <EditText
         android:id="@+id/etBudgetAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="請輸入金額"
         android:inputType="numberDecimal"
-        android:background="@drawable/bg_card_light"
-        android:padding="8dp"
-        android:textColor="#4A3B2A"
+        android:background="@drawable/ic_back"
+        android:padding="12dp"
+        android:textColor="@color/yuanbao_text_dark"
+        android:textColorHint="#D0C7B6"
         android:textSize="16sp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="10dp" />
 
-    <!-- 儲存按鈕 -->
+    <!-- 儲存按鈕（元寶圓角） -->
     <Button
         android:id="@+id/btnSaveBudget"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="儲存預算"
-        android:textColor="@android:color/white"
-        android:backgroundTint="#A67C52"
-        android:layout_marginTop="24dp"
-        android:padding="12dp" />
+        android:textColor="@color/yuanbao_white"
+        android:textSize="16sp"
+        android:background="@drawable/ic_back"
+        android:layout_marginTop="28dp" />
+
 </LinearLayout>

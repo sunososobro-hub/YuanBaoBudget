@@ -57,11 +57,14 @@ dependencies {
     // --- Glide (用於載入 Google 大頭貼) ---
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.google.android.material:material:1.12.0")
 
     // ✅ Room 資料庫
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("com.opencsv:opencsv:5.7.1")
+
 
     // 測試
     testImplementation("junit:junit:4.13.2")

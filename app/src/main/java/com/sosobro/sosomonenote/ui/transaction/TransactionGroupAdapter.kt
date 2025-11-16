@@ -37,29 +37,46 @@ class TransactionGroupAdapter(
 
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         val (date, transactions) = data[position]
+
+        // 日期標題
         holder.binding.tvDate.text = date
+
+        // 清空舊資料
         holder.binding.containerTransactions.removeAllViews()
 
         transactions.forEachIndexed { index, txn ->
-            val tv = TextView(holder.itemView.context).apply {
-                text =
-                    "${txn.category}：${if (txn.type.contains("支出")) "-" else "+"}NT$${"%,.0f".format(txn.amount)}"
-                setTextColor(Color.parseColor("#4A3B2A"))
-                textSize = 16f
-                setPadding(8, 8, 8, 8)
+            val itemView = LayoutInflater
+                .from(holder.itemView.context)
+                .inflate(
+                    com.sosobro.sosomonenote.R.layout.item_transaction_row,
+                    holder.binding.containerTransactions,
+                    false
+                )
 
-                // ✅ 告訴 Fragment 有人點擊了這筆交易
-                setOnClickListener { onTransactionClick(txn) }
-            }
+            val tvTitle = itemView.findViewById<TextView>(com.sosobro.sosomonenote.R.id.tvTitle)
+            val tvAccount = itemView.findViewById<TextView>(com.sosobro.sosomonenote.R.id.tvAccount)
+            val tvAmount = itemView.findViewById<TextView>(com.sosobro.sosomonenote.R.id.tvAmount)
 
-            holder.binding.containerTransactions.addView(tv)
+            tvTitle.text = txn.category
+            tvAccount.text = txn.note ?: ""
+
+            val isExpense = txn.type.contains("支出")
+            val amountText = (if (isExpense) "-" else "+") + "NT$" +
+                    String.format("%,.0f", txn.amount)
+
+            tvAmount.text = amountText
+            tvAmount.setTextColor(if (isExpense) Color.parseColor("#C62828") else Color.parseColor("#2E7D32"))
+
+            itemView.setOnClickListener { onTransactionClick(txn) }
+
+            holder.binding.containerTransactions.addView(itemView)
 
             if (index < transactions.size - 1) {
                 val divider = View(holder.itemView.context).apply {
                     setBackgroundColor(Color.parseColor("#DDDDDD"))
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        2
+                        1
                     )
                 }
                 holder.binding.containerTransactions.addView(divider)

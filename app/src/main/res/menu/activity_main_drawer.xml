@@ -9,7 +9,7 @@
             android:icon="@drawable/ic_budge"
             android:title="@string/menu_budge" />
         <item
-            android:id="@+id/nav_import"
+            android:id="@+id/nav_import_data"
             android:icon="@drawable/ic_import"
             android:title="@string/menu_import" />
         <item
@@ -21,6 +21,10 @@
             android:icon="@drawable/ic_cata_setting"
             android:title="@string/menu_data_sync" />
 
+        <item
+            android:id="@+id/nav_contact_us"
+            android:icon="@drawable/ic_cata_setting"
+            android:title="@string/menu_contact_us" />
         <item
             android:id="@+id/nav_delete_all"
             android:icon="@drawable/ic_delete"

@@ -53,19 +53,13 @@ class AccountAdapter(
 
     fun moveItem(from: Int, to: Int) {
         if (from !in items.indices || to !in items.indices) return
+        val moved = items[from]
+        if (moved !is ListItem.Account) return
 
-        val movedItem = items[from]
-        if (movedItem !is ListItem.Account) return  // 只能移動 Account
         items.removeAt(from)
-        items.add(to, movedItem)
+        items.add(to, moved)
 
-        // 1. 找 movedItem 的舊群組
-        val oldCategory = movedItem.category
-        val oldList = allData[oldCategory] ?: return
-        oldList.remove(movedItem.account)
-
-        // 2. 往上找最近的 Header -> 判斷新群組
-        var newCategory = oldCategory
+        var newCategory = moved.category
         for (i in to downTo 0) {
             val item = items[i]
             if (item is ListItem.Header) {
@@ -74,18 +68,24 @@ class AccountAdapter(
             }
         }
 
-        // 3. 加入新群組
-        val newList = allData[newCategory]!!
-        newList.add(movedItem.account)
+        val oldList = allData[moved.category]!!
+        oldList.remove(moved.account)
 
-        // 4. 更新 UI
+        val newList = allData[newCategory]!!
+        newList.add(moved.account)
+
+        moved.account.type = newCategory
+
+        allData.forEach { (_, list) ->
+            list.forEachIndexed { index, acc ->
+                acc.sortOrder = index
+            }
+        }
+
         notifyItemMoved(from, to)
 
-        // 5. Callback 回 Fragment 存 DB sortOrder
         onDataChanged(getCurrentList())
     }
-
-
 
     fun getCurrentList(): List<AccountEntity> =
         allData.values.flatten()
@@ -130,13 +130,14 @@ class AccountAdapter(
                 val now = expandedMap[header.title] ?: true
                 expandedMap[header.title] = !now
                 rebuildVisibleList()
-                onExpandedChanged(expandedMap) // ✅ 即時保存狀態
+                onExpandedChanged(expandedMap)
             }
         }
     }
 
     inner class AccountViewHolder(private val binding: ItemAccountCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(account: AccountEntity) {
             binding.tvAccountName.text = account.name
             binding.tvAmount.text = "NT$${String.format("%,.0f", account.balance)}"

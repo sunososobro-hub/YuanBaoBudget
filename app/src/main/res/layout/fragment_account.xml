@@ -6,11 +6,6 @@
     android:background="#F5E7D2"
     android:padding="12dp">
 
-    <!-- 🔹 淨資產區 -->
-    <include
-        layout="@layout/layout_account_summary"
-        android:id="@+id/layoutSummary" />
-
     <!-- 🔹 單一 RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewAccounts"

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4E7D3"
+    android:background="@color/yuanbao_bg"
     android:padding="16dp"
     tools:context=".ui.addaccount.AddAccountActivity">
 
@@ -12,20 +12,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 🔹 標題列（返回＋標題＋儲存） -->
+        <!-- 🟡 元寶 AppBar -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/yuanbao_primary"
+            android:paddingHorizontal="12dp"
+            android:gravity="center_vertical">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_alignParentStart="true"
-                android:background="@android:color/transparent"
                 android:src="@drawable/ic_back"
-                android:contentDescription="返回" />
+                android:tint="@color/yuanbao_white"
+                android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -33,77 +36,74 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="新增帳戶"
+                android:textColor="@color/yuanbao_white"
                 android:textStyle="bold"
-                android:textColor="#4A3B2A"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnSave"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_alignParentEnd="true"
-                android:background="@android:color/transparent"
                 android:src="@drawable/ic_save"
-                android:contentDescription="儲存" />
+                android:tint="@color/yuanbao_white"
+                android:background="?attr/selectableItemBackgroundBorderless" />
         </RelativeLayout>
 
-        <!-- 帳戶資訊卡片 -->
+
+        <!-- 🧁 元寶卡片 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_card_light"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="8dp">
+            style="@style/YuanBaoCard"
+            android:orientation="vertical">
 
-            <!-- 🟣 帳戶名稱 -->
+            <!-- 帳戶名稱 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="帳戶名稱"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#4A3B2A"
-                    android:textSize="16sp" />
+                    android:textColor="@color/yuanbao_text_dark" />
 
                 <EditText
                     android:id="@+id/etAccountName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="請輸入"
-                    android:textColorHint="#C2B9AF"
-                    android:textColor="#4A3B2A"
+                    android:textColor="@color/yuanbao_text_dark"
+                    android:textColorHint="#D0C7B6"
                     android:background="@android:color/transparent" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#E0D3C1" />
+                android:background="#F0E6D4" />
 
             <!-- 帳戶類型 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="帳戶類型"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#4A3B2A"
-                    android:textSize="16sp" />
+                    android:textColor="@color/yuanbao_text_dark" />
 
                 <TextView
                     android:id="@+id/tvSelectAccountType"
@@ -112,7 +112,7 @@
                     android:text="請選擇"
                     android:textColor="#9E9489"
                     android:textSize="15sp"
-                    android:drawableEnd="@drawable/ic_menu_camera"
+                    android:drawableEnd="@drawable/ic_arrow_down"
                     android:drawablePadding="6dp"
                     android:paddingEnd="4dp" />
             </LinearLayout>
@@ -120,66 +120,64 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#E0D3C1" />
+                android:background="#F0E6D4" />
 
-            <!-- 當前餘額 -->
+            <!-- 餘額 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="當前餘額"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#4A3B2A"
-                    android:textSize="16sp" />
+                    android:textColor="@color/yuanbao_text_dark" />
 
                 <EditText
                     android:id="@+id/etBalance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="請輸入"
-                    android:textColorHint="#C2B9AF"
                     android:inputType="numberDecimal"
-                    android:textColor="#4A3B2A"
+                    android:textColor="@color/yuanbao_text_dark"
+                    android:textColorHint="#D0C7B6"
                     android:background="@android:color/transparent" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#E0D3C1" />
+                android:background="#F0E6D4" />
 
             <!-- 貨幣 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="貨幣"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#4A3B2A"
-                    android:textSize="16sp" />
+                    android:textColor="@color/yuanbao_text_dark" />
 
                 <TextView
                     android:id="@+id/tvCurrency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NT$ (TWD)"
-                    android:textColor="#4A3B2A"
                     android:textSize="15sp"
-                    android:drawableEnd="@drawable/ic_menu_camera"
+                    android:textColor="@color/yuanbao_text_dark"
+                    android:drawableEnd="@drawable/ic_arrow_down"
                     android:drawablePadding="6dp"
                     android:paddingEnd="4dp" />
             </LinearLayout>
@@ -187,34 +185,36 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#E0D3C1" />
+                android:background="#F0E6D4" />
 
             <!-- 備註 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="備註"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#4A3B2A"
-                    android:textSize="16sp" />
+                    android:textColor="@color/yuanbao_text_dark" />
 
                 <EditText
                     android:id="@+id/etNote"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="請輸入"
-                    android:textColorHint="#C2B9AF"
-                    android:textColor="#4A3B2A"
+                    android:textColorHint="#D0C7B6"
+                    android:textColor="@color/yuanbao_text_dark"
                     android:background="@android:color/transparent" />
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
+
 </ScrollView>

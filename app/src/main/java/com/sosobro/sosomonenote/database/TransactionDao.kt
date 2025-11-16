@@ -30,7 +30,7 @@ interface TransactionDao {
     SELECT * FROM transactions
     WHERE strftime('%Y', date) = :yearStr
       AND strftime('%m', date) = :monthStr
-""")
+    """)
     suspend fun getValidTransactionsForMonth(yearStr: String, monthStr: String): List<TransactionEntity>
 
     @Query("DELETE FROM transactions")
@@ -54,8 +54,10 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE strftime('%Y', date) = :year AND strftime('%m', date) = printf('%02d', :month)")
     suspend fun getTransactionsForMonth(year: Int, month: Int): List<TransactionEntity>
 
+    // ⭐ 正確版本，保留這個就好
+    @Query("SELECT * FROM transactions WHERE date = :date")
+    suspend fun getTransactionsByDate(date: String): List<TransactionEntity>
 
-    // ⭐⭐⭐ 你缺少的 → 我幫你補上
     @Query("SELECT * FROM transactions WHERE date < :date ORDER BY date DESC")
     suspend fun getTransactionsBeforeDate(date: String): List<TransactionEntity>
 }

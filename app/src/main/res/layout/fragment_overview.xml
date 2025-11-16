@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5E7D2"
     tools:context=".ui.overview.OverviewFragment">
 
     <LinearLayout
@@ -10,123 +13,142 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 📈 本月資產變化圖 -->
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/lineChart"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginBottom="16dp" />
+        <!-- 🔹 淨資產 Summary（從 AccountFragment 搬過來） -->
+        <include
+            layout="@layout/layout_account_summary"
+            android:id="@+id/layoutSummary" />
 
-        <!-- 💰 總資產 -->
-        <TextView
-            android:id="@+id/tvTotalAssets"
+        <!-- 📈 折線圖卡片 -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="NT$0"
-            android:textColor="#5B6FC7"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#F9F3EB"
+            android:padding="12dp">
 
-        <!-- 💧 四個預算水缸 -->
-        <LinearLayout
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:tabIndicatorColor="#6D5B4E"
+                    app:tabSelectedTextColor="#6D5B4E"
+                    app:tabTextColor="#4A3B2A"
+                    app:tabIndicatorFullWidth="false" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- 💧 預算水缸 -->
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_horizontal"
-            android:weightSum="4">
+            android:columnCount="2"
+            android:alignmentMode="alignMargins"
+            android:useDefaultMargins="true">
 
-            <!-- 月度預算 -->
             <LinearLayout
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_columnWeight="1">
 
                 <TextView
+                    android:text="月度預算"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="月度預算"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="#4A3B2A" />
 
                 <com.sosobro.sosomonenote.ui.custom.WaterTankView
                     android:id="@+id/waterTankMonth"
                     android:layout_width="90dp"
-                    android:layout_height="150dp" />
+                    android:layout_height="150dp"
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
 
-            <!-- 兩月預算 -->
             <LinearLayout
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_columnWeight="1">
 
                 <TextView
+                    android:text="兩月預算"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="兩月預算"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="#4A3B2A" />
 
                 <com.sosobro.sosomonenote.ui.custom.WaterTankView
                     android:id="@+id/waterTankBiMonth"
                     android:layout_width="90dp"
-                    android:layout_height="150dp" />
+                    android:layout_height="150dp"
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
 
-            <!-- 季度預算 -->
             <LinearLayout
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_columnWeight="1">
 
                 <TextView
+                    android:text="季度預算"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="季度預算"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="#4A3B2A" />
 
                 <com.sosobro.sosomonenote.ui.custom.WaterTankView
                     android:id="@+id/waterTankQuarter"
                     android:layout_width="90dp"
-                    android:layout_height="150dp" />
+                    android:layout_height="150dp"
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
 
-            <!-- 年度預算 -->
             <LinearLayout
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_columnWeight="1">
 
                 <TextView
+                    android:text="年度預算"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="年度預算"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="#4A3B2A" />
 
                 <com.sosobro.sosomonenote.ui.custom.WaterTankView
                     android:id="@+id/waterTankYear"
                     android:layout_width="90dp"
-                    android:layout_height="150dp" />
+                    android:layout_height="150dp"
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
-        </LinearLayout>
 
+        </GridLayout>
 
     </LinearLayout>
+
 </ScrollView>

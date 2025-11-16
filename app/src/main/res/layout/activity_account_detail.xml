@@ -1,125 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4E7D3"
-    tools:context=".ui.account.AccountDetailActivity">
+    android:background="@color/cute_bg">
 
-    <!-- 🔹 頂部 App Bar -->
+    <!-- ⭐ App Bar（延用原本設計） -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#D4B5E4"
+        android:background="@color/yuanbao_primary"
         android:paddingHorizontal="12dp"
         android:gravity="center_vertical">
 
-        <!-- 返回鍵 -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_drop_down"
-            android:tint="#FFFFFF"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="返回" />
+            android:src="@drawable/ic_back"
+            android:tint="@color/white"
+            android:layout_centerVertical="true" />
 
-        <!-- 標題 -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="帳戶"
-            android:textColor="#FFFFFF"
+            android:text="帳戶明細"
+            android:textColor="@color/white"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textSize="18sp" />
+            android:layout_centerInParent="true" />
 
         <ImageView
             android:id="@+id/btnEditAccount"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:src="@drawable/ic_edit"
+            android:tint="@color/white"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_delete"
-            android:tint="#FFFFFF"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="修改帳戶" />
+            android:layout_marginEnd="48dp"
+            android:layout_centerVertical="true" />
 
-        <!-- 刪除按鈕 -->
         <ImageView
             android:id="@+id/btnDeleteAccount"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:src="@drawable/ic_delete"
-            android:tint="#FFFFFF"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="刪除帳戶" />
+            android:tint="@color/white"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
-    <!-- 主要內容 -->
-    <androidx.core.widget.NestedScrollView
+    <!-- ⭐ Scroll 區域（全部卡片化放在裡面） -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_marginTop="56dp"
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:gravity="center_horizontal">
 
-            <!-- 🧸 帳戶卡片 -->
-            <LinearLayout
+            <!-- 🍰 帳戶卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAccountInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_light"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="@color/white"
+                android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/tvAccountName"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="帳戶名稱"
-                    android:textColor="#4A3B2A"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvBalance"
+                    <TextView
+                        android:id="@+id/tvAccountName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="帳戶名稱"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cute_text_dark" />
+
+                    <TextView
+                        android:id="@+id/tvBalance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NT$0"
+                        android:textSize="18sp"
+                        android:textColor="@color/cute_primary"
+                        android:layout_marginTop="8dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 🍡 月份選擇卡 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="@color/white"
+                android:padding="16dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="NT$ 0"
-                    android:textColor="#5B6FC7"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-            <!-- 🔸 交易紀錄標題 -->
-            <TextView
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="月份"
+                        android:textStyle="bold"
+                        android:textColor="@color/cute_text_dark"
+                        android:textSize="16sp"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerMonth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 🎀 交易紀錄卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="交易紀錄"
-                android:textColor="#4A3B2A"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="@color/white"
+                android:padding="16dp">
 
-            <!-- 🔸 交易列表 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTransactions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="80dp"
-                android:nestedScrollingEnabled="false" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="交易紀錄"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="@color/cute_text_dark"
+                        android:layout_marginBottom="12dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerTransactions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:clipToPadding="false"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
